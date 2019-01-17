@@ -42,7 +42,7 @@ class ProductControllerUnitTest extends TestCase
         factory(ProductToCategory::class)->create(['category_id' => 1, 'product_id' => 2]);
         factory(ProductToCategory::class)->create(['category_id' => 2, 'product_id' => 3]);
         factory(ProductToCategory::class)->create(['category_id' => 2, 'product_id' => 4]);
-        factory(ProductOption::class)->create(['product_id' => 1]);
+        // factory(ProductOption::class)->create(['product_id' => 1]);
 
         $response = $this->json('GET', '/api/products', [])
             ->assertStatus(200)

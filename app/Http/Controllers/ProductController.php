@@ -24,9 +24,9 @@ class ProductController extends Controller
             $dto['category_id'] = $category->category_id;
             $dto['name'] = $category->description->name;
             $products = $category->products()->get();
-            foreach ($products as $product) {
-                $product['options'] = $product->options();
-            }
+            // foreach ($products as $product) {
+            //     $product['options'] = $product->options();
+            // }
             $dto['products'] = $products;
             array_push($responseData, $dto);
         }
