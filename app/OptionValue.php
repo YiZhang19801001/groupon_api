@@ -13,4 +13,9 @@ class OptionValue extends Model
     protected $fillable = ['option_id'];
 
     protected $attributes = ['image' => '', 'sort_order' => 1];
+
+    public function description()
+    {
+        return $this->hasOne('App\OptionValueDescription', 'option_value_id', 'option_value_id');
+    }
 }

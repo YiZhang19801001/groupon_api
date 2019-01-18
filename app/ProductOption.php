@@ -22,4 +22,8 @@ class ProductOption extends Model
     {
         return $this->hasOne('App\OptionDescription', 'option_id', 'option_id');
     }
+    public function optionValues()
+    {
+        return $this->hasMany('App\ProductOptionValue', 'product_option_id', 'product_option_id');
+    }
 }

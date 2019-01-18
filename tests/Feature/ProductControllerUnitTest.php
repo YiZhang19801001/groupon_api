@@ -6,8 +6,11 @@ use App\Category;
 use App\CategoryDescription;
 use App\Option;
 use App\OptionDescription;
+use App\OptionValue;
+use App\OptionValueDescription;
 use App\Product;
 use App\ProductOption;
+use App\ProductOptionValue;
 use App\ProductToCategory;
 use Tests\TestCase;
 
@@ -54,6 +57,21 @@ class ProductControllerUnitTest extends TestCase
         factory(OptionDescription::class)->create(['option_id' => 1, 'language_id' => 1, 'name' => 'How sweet']);
         factory(OptionDescription::class)->create(['option_id' => 2, 'language_id' => 1, 'name' => 'Topping']);
 
+        factory(OptionValue::class)->create(['option_id' => 1]);
+        factory(OptionValue::class)->create(['option_id' => 1]);
+        factory(OptionValue::class)->create(['option_id' => 2]);
+        factory(OptionValue::class)->create(['option_id' => 2]);
+
+        factory(ProductOptionValue::class)->create(['product_option_id' => 1, 'product_id' => 1, 'option_id' => 1, 'option_value_id' => 1, 'quantity' => 1, 'price' => 2.00]);
+        factory(ProductOptionValue::class)->create(['product_option_id' => 1, 'product_id' => 1, 'option_id' => 1, 'option_value_id' => 2, 'quantity' => 1, 'price' => 3.00]);
+        factory(ProductOptionValue::class)->create(['product_option_id' => 2, 'product_id' => 1, 'option_id' => 2, 'option_value_id' => 3, 'quantity' => 1, 'price' => 4.00]);
+        factory(ProductOptionValue::class)->create(['product_option_id' => 2, 'product_id' => 1, 'option_id' => 2, 'option_value_id' => 4, 'quantity' => 1, 'price' => 5.00]);
+
+        factory(OptionValueDescription::class)->create(['option_value_id' => 1, 'language_id' => 1, 'option_id' => 1, 'name' => 'mild']);
+        factory(OptionValueDescription::class)->create(['option_value_id' => 2, 'language_id' => 1, 'option_id' => 1, 'name' => 'very sweet']);
+        factory(OptionValueDescription::class)->create(['option_value_id' => 3, 'language_id' => 1, 'option_id' => 2, 'name' => 'peral']);
+        factory(OptionValueDescription::class)->create(['option_value_id' => 4, 'language_id' => 1, 'option_id' => 2, 'name' => 'unknown']);
+
         $response = $this->json('GET', '/api/products', [])
             ->assertStatus(200)
             ->assertJson([
@@ -62,8 +80,15 @@ class ProductControllerUnitTest extends TestCase
                     'name' => 'category_1',
                     'products' => [
                         ['product_id' => 1, 'price' => "10.00", 'sku' => 'abc123', 'quantity' => "1", "options" => [
-                            ['option_name' => 'How sweet', 'required' => 1, 'type' => 'radio'],
-                            ['option_name' => 'Topping', 'required' => 1, 'type' => 'checkbox'],
+                            ['option_name' => 'How sweet', 'required' => '1', 'type' => 'radio', 'values' => [
+                                ['name' => 'mild', 'price' => '2.00'],
+                                ['name' => 'very sweet', 'price' => '3.00'],
+                            ]],
+                            ['option_name' => 'Topping', 'required' => '1', 'type' => 'checkbox', 'values' => [
+                                ['name' => 'peral', 'price' => '4.00'],
+                                ['name' => 'unknown', 'price' => '5.00'],
+
+                            ]],
                         ]],
                         ['product_id' => 2, 'price' => "12.00", 'sku' => 'abc124', 'quantity' => "1", "options" => []],
                     ],

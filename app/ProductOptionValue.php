@@ -15,7 +15,7 @@ class ProductOptionValue extends Model
         'subtract' => 1,
         'price_prefix' => '$',
         'points' => 0,
-        'points' => 'P',
+        'points_prefix' => 'P',
         'weight' => 12.2,
         'weight_prefix' => 'G',
     ];
@@ -28,8 +28,13 @@ class ProductOptionValue extends Model
         'subtract',
         'price_prefix',
         'points',
-        'points',
+        'points_prefix',
         'weight',
         'weight_prefix',
     ];
+
+    public function description()
+    {
+        return $this->hasOne('App\OptionValueDescription', 'option_value_id', 'option_value_id');
+    }
 }

@@ -29,11 +29,21 @@ class ProductController extends Controller
                 $product_options = $product->options()->get();
                 foreach ($product_options as $product_option) {
                     $newOption = array();
+
                     $newOption['option_name'] = $product_option->optionDescription->name;
                     $newOption['required'] = $product_option->required;
-
                     $newOption['type'] = $product_option->option->type;
 
+                    $newValues = array();
+                    $productOptionValues = $product_option->optionValues()->get();
+                    foreach ($productOptionValues as $productOptionValue) {
+                        $newValue = array();
+                        $newValue['name'] = $productOptionValue->description->name;
+                        $newValue['price'] = number_format($productOptionValue->price, 2);
+
+                        array_push($newValues, $newValue);
+                    }
+                    $newOption['values'] = $newValues;
                     array_push($options, $newOption);
                 }
                 $product['options'] = $options;
