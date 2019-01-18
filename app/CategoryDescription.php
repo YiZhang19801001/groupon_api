@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryDescription extends Model
 {
     protected $table = 'oc_category_description';
+
     public $timestamps = false;
 
     protected $fillable = ['category_id', 'language_id', 'name'];
