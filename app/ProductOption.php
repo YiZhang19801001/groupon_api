@@ -18,9 +18,9 @@ class ProductOption extends Model
         return $this->hasOne('App\Option', 'option_id', 'option_id');
     }
 
-    public function optionDescription()
+    public function optionDescriptions()
     {
-        return $this->hasOne('App\OptionDescription', 'option_id', 'option_id');
+        return $this->hasMany('App\OptionDescription', 'option_id', 'option_id');
     }
     public function optionValues()
     {

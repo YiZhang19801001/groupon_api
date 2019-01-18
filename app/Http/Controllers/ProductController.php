@@ -13,16 +13,23 @@ class ProductController extends Controller
      * @param none
      * @return Response
      */
-    public function index()
+    public function index($language_id)
     {
-        $categories = Category::with('description')->get();
+        $categories = Category::all();
 
         $responseData = [];
 
         foreach ($categories as $category) {
             $dto = [];
             $dto['category_id'] = $category->category_id;
-            $dto['name'] = $category->description->name;
+
+            // find category for $language_id matching language
+            $categoryDescription = $category->descriptions()->where('language_id', $language_id)->first();
+            if ($categoryDescription === null) { // if no matching language record provide default validate value for it.
+                $categoryDescription = $category->descriptions()->first();
+            }
+            $dto['name'] = $categoryDescription->name;
+
             $products = $category->products()->get();
             foreach ($products as $product) {
                 $options = array();
@@ -30,15 +37,28 @@ class ProductController extends Controller
                 foreach ($product_options as $product_option) {
                     $newOption = array();
 
-                    $newOption['option_name'] = $product_option->optionDescription->name;
+                    $productOptionDescription = $product_option->optionDescriptions()->where('language_id', $language_id)->first();
+                    if ($productOptionDescription === null) {
+                        $productOptionDescription = $product_option->optionDescriptions()->first();
+
+                    }
+                    $newOption['option_name'] = $productOptionDescription->name;
+
                     $newOption['required'] = $product_option->required;
                     $newOption['type'] = $product_option->option->type;
 
                     $newValues = array();
+
                     $productOptionValues = $product_option->optionValues()->get();
                     foreach ($productOptionValues as $productOptionValue) {
                         $newValue = array();
-                        $newValue['name'] = $productOptionValue->description->name;
+
+                        $productOptionValueDescription = $productOptionValue->descriptions()->where('language_id', $language_id)->first();
+                        if ($productOptionValueDescription === null) {
+                            $productOptionValueDescription = $productOptionValue->descriptions()->first();
+                        }
+
+                        $newValue['name'] = $productOptionValueDescription->name;
                         $newValue['price'] = number_format($productOptionValue->price, 2);
 
                         array_push($newValues, $newValue);

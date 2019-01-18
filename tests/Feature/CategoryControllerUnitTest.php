@@ -64,6 +64,39 @@ class CategoryControllerUnitTest extends TestCase
 
     }
 
+    public function test_show_all_category_correctly()
+    {
+        Category::create();
+        Category::create();
+
+        CategoryDescription::create(['language_id' => 1, 'category_id' => 1, 'name' => 'food']);
+        CategoryDescription::create(['language_id' => 1, 'category_id' => 2, 'name' => 'drink']);
+
+        $response = $this->json('get', '/api/categories/1', [])
+            ->assertStatus(200)
+            ->assertJson([
+                ['category_id' => 1, 'name' => 'food'],
+                ['category_id' => 2, 'name' => 'drink'],
+            ]);
+    }
+
+    public function test_show_all_category_correctly_use_no_matching_language_result_as_alternative()
+    {
+        Category::create();
+        Category::create();
+
+        CategoryDescription::create(['language_id' => 1, 'category_id' => 1, 'name' => 'food']);
+        CategoryDescription::create(['language_id' => 2, 'category_id' => 1, 'name' => '食物']);
+        CategoryDescription::create(['language_id' => 1, 'category_id' => 2, 'name' => 'drink']);
+
+        $response = $this->json('get', '/api/categories/2', [])
+            ->assertStatus(200)
+            ->assertJson([
+                ['category_id' => 1, 'name' => '食物'],
+                ['category_id' => 2, 'name' => 'drink'],
+            ]);
+    }
+
     public function test_update_category_success_by_correct_request_input()
     {
         $category = Category::create();

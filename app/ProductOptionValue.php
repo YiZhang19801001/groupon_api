@@ -33,8 +33,8 @@ class ProductOptionValue extends Model
         'weight_prefix',
     ];
 
-    public function description()
+    public function descriptions()
     {
-        return $this->hasOne('App\OptionValueDescription', 'option_value_id', 'option_value_id');
+        return $this->hasMany('App\OptionValueDescription', 'option_value_id', 'option_value_id');
     }
 }

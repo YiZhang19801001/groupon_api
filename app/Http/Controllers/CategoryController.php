@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    public function index($language_id)
+    {
+        $category = Category::all();
+        $categoryDescriptions = CategoryDescription::where('language_id',$language_id);
+    }
     public function create(Request $request)
     {
         $validatedData = $request->validate([

@@ -77,7 +77,7 @@ class ProductControllerUnitTest extends TestCase
         factory(OptionValueDescription::class)->create(['option_value_id' => 3, 'language_id' => 1, 'option_id' => 2, 'name' => 'peral']);
         factory(OptionValueDescription::class)->create(['option_value_id' => 4, 'language_id' => 1, 'option_id' => 2, 'name' => 'unknown']);
 
-        $response = $this->json('GET', '/api/products', [])
+        $response = $this->json('GET', '/api/products/1', [])
             ->assertStatus(200)
             ->assertJson([
                 [

@@ -39,8 +39,8 @@ class Category extends Model
         return $this->hasManyThrough('App\Product', 'App\ProductToCategory', 'category_id', 'product_id', 'category_id', 'product_id');
     }
 
-    public function description()
+    public function descriptions()
     {
-        return $this->hasOne('App\CategoryDescription', 'category_id', 'category_id');
+        return $this->hasMany('App\CategoryDescription', 'category_id', 'category_id');
     }
 }

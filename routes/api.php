@@ -17,9 +17,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('products', 'ProductController@index');
+Route::get('products/{language_id}', 'ProductController@index');
 Route::post('products', 'ProductController@create');
 Route::put('products/{product_id}', 'ProductController@update');
 
+Route::get('categories/{language_id}', 'CategoryController@index');
 Route::post('categories', 'CategoryController@create');
 Route::put('categories/{category_id}', 'CategoryController@update');
+Route::get('categories/{category_id}', 'CategoryController@show');
