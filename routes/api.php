@@ -22,6 +22,6 @@ Route::post('products', 'ProductController@create');
 Route::put('products/{product_id}', 'ProductController@update');
 
 Route::get('categories/{language_id}', 'CategoryController@index');
+Route::get('categories/{language_id}/{category_id}', 'CategoryController@show');
 Route::post('categories', 'CategoryController@create');
 Route::put('categories/{category_id}', 'CategoryController@update');
-Route::get('categories/{category_id}', 'CategoryController@show');

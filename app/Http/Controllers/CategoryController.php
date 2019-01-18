@@ -36,6 +36,23 @@ class CategoryController extends Controller
         return response()->json(['categories' => $response_array], 200);
 
     }
+    /**
+     * return single category format ['category_id','name']
+     * @param Integer $language_id
+     * @param Integer $category_id
+     * @return Response select category with name
+     */
+    public function show($language_id, $category_id)
+    {
+        $category = Category::find($category_id);
+        $description = $category->descriptions()->where('language_id', $language_id)->first();
+        if ($description === null) {
+            $description = $category->descriptions()->first();
+
+        }
+
+        return response()->json(['category' => ['category_id' => $category->category_id, 'name' => $description->name]], 200);
+    }
     public function create(Request $request)
     {
         $validatedData = $request->validate([
