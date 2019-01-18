@@ -13,9 +13,11 @@ class CreateOptionDescriptionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('option_descriptions', function (Blueprint $table) {
+        Schema::create('oc_option_description', function (Blueprint $table) {
             $table->primary(['option_id', 'language_id']);
-            $table->string('name', 128);
+            $table->integer('option_id', false, true)->length(11);
+            $table->integer('language_id', false, true)->length(11);
+            $table->string('name');
 
         });
     }

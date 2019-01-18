@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Category;
 use App\CategoryDescription;
+use App\Option;
+use App\OptionDescription;
 use App\Product;
+use App\ProductOption;
 use App\ProductToCategory;
 use Tests\TestCase;
 
@@ -42,7 +45,14 @@ class ProductControllerUnitTest extends TestCase
         factory(ProductToCategory::class)->create(['category_id' => 1, 'product_id' => 2]);
         factory(ProductToCategory::class)->create(['category_id' => 2, 'product_id' => 3]);
         factory(ProductToCategory::class)->create(['category_id' => 2, 'product_id' => 4]);
-        // factory(ProductOption::class)->create(['product_id' => 1]);
+        factory(ProductOption::class)->create(['product_id' => 1, 'option_id' => 1, 'value' => '', 'required' => 1]);
+        factory(ProductOption::class)->create(['product_id' => 1, 'option_id' => 2, 'value' => '', 'required' => 1]);
+
+        factory(Option::class)->create(['type' => 'radio', 'sort_order' => 1]);
+        factory(Option::class)->create(['type' => 'checkbox', 'sort_order' => 2]);
+
+        factory(OptionDescription::class)->create(['option_id' => 1, 'language_id' => 1, 'name' => 'How sweet']);
+        factory(OptionDescription::class)->create(['option_id' => 2, 'language_id' => 1, 'name' => 'Topping']);
 
         $response = $this->json('GET', '/api/products', [])
             ->assertStatus(200)
@@ -51,16 +61,19 @@ class ProductControllerUnitTest extends TestCase
                     'category_id' => 1,
                     'name' => 'category_1',
                     'products' => [
-                        ['product_id' => 1, 'price' => "10.00", 'sku' => 'abc123', 'quantity' => "1"],
-                        ['product_id' => 2, 'price' => "12.00", 'sku' => 'abc124', 'quantity' => "1"],
+                        ['product_id' => 1, 'price' => "10.00", 'sku' => 'abc123', 'quantity' => "1", "options" => [
+                            ['option_name' => 'How sweet', 'required' => 1, 'type' => 'radio'],
+                            ['option_name' => 'Topping', 'required' => 1, 'type' => 'checkbox'],
+                        ]],
+                        ['product_id' => 2, 'price' => "12.00", 'sku' => 'abc124', 'quantity' => "1", "options" => []],
                     ],
                 ],
                 [
                     'category_id' => 2,
                     'name' => 'category_2',
                     'products' => [
-                        ['product_id' => 3, 'price' => "10.80", 'sku' => 'abc125', 'quantity' => "1"],
-                        ['product_id' => 4, 'price' => "12.80", 'sku' => 'abc126', 'quantity' => "1"],
+                        ['product_id' => 3, 'price' => "10.80", 'sku' => 'abc125', 'quantity' => "1", "options" => []],
+                        ['product_id' => 4, 'price' => "12.80", 'sku' => 'abc126', 'quantity' => "1", "options" => []],
                     ],
                 ],
             ])

@@ -10,16 +10,16 @@ class ProductOption extends Model
     protected $primaryKey = 'product_option_id';
     public $timestamps = false;
 
-    protected $fillable = [];
-    protected $hidden = [];
+    protected $fillable = ['product_id', 'option_id', 'value', 'required'];
+    protected $hidden = ['product_id', 'option_id'];
 
     public function option()
     {
-        return $this->hasOne('oc_option', 'option_id', 'option_id');
+        return $this->hasOne('App\Option', 'option_id', 'option_id');
     }
 
-    public function option_description()
+    public function optionDescription()
     {
-        return $this->hasOne('oc_option_description', 'option_id', 'option_id');
+        return $this->hasOne('App\OptionDescription', 'option_id', 'option_id');
     }
 }

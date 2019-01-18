@@ -84,4 +84,15 @@ class Product extends Model
         return number_format($value, 2);
     }
 
+    /**
+     * Get the product's options array
+     *
+     * @param void
+     * @return Array options belong to $this
+     */
+    public function options()
+    {
+        return $this->hasMany('App\ProductOption', 'product_id', 'product_id');
+    }
+
 }

@@ -15,7 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $categories = Category::with('description')->get();
 
         $responseData = [];
 
@@ -24,9 +24,20 @@ class ProductController extends Controller
             $dto['category_id'] = $category->category_id;
             $dto['name'] = $category->description->name;
             $products = $category->products()->get();
-            // foreach ($products as $product) {
-            //     $product['options'] = $product->options();
-            // }
+            foreach ($products as $product) {
+                $options = array();
+                $product_options = $product->options()->get();
+                foreach ($product_options as $product_option) {
+                    $newOption = array();
+                    $newOption['option_name'] = $product_option->optionDescription->name;
+                    $newOption['required'] = $product_option->required;
+
+                    $newOption['type'] = $product_option->option->type;
+
+                    array_push($options, $newOption);
+                }
+                $product['options'] = $options;
+            }
             $dto['products'] = $products;
             array_push($responseData, $dto);
         }
