@@ -20,3 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('products', 'ProductController@index');
 Route::post('products', 'ProductController@create');
 Route::put('products/{product_id}', 'ProductController@update');
+
+Route::post('categories', 'CategoryController@create');
+Route::put('categories/{category_id}', 'CategoryController@update');

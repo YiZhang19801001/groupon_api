@@ -16,6 +16,11 @@ use Tests\TestCase;
 
 class ProductControllerUnitTest extends TestCase
 {
+    /**
+     * Test GET domain/api/products return full detailed product list
+     *
+     * @return void
+     */
     public function test_get_all_products()
     {
 
@@ -108,6 +113,11 @@ class ProductControllerUnitTest extends TestCase
 
     }
 
+    /**
+     * Test POST domain/api/proructs create correct instance in database
+     *
+     * @return void
+     */
     public function test_create_product_success_with_correct_input()
     {
 
@@ -122,7 +132,7 @@ class ProductControllerUnitTest extends TestCase
 
     }
 
-    public function test_create_product_fail_without_quantity(Type $var = null)
+    public function test_create_product_fail_without_quantity()
     {
         $payload = [
             'price' => 12,
@@ -136,7 +146,7 @@ class ProductControllerUnitTest extends TestCase
             ]]);
 
     }
-    public function test_create_product_fail_without_sku(Type $var = null)
+    public function test_create_product_fail_without_sku()
     {
         $payload = [
             'price' => 12,
@@ -150,7 +160,7 @@ class ProductControllerUnitTest extends TestCase
             ]]);
 
     }
-    public function test_create_product_fail_without_price(Type $var = null)
+    public function test_create_product_fail_without_price()
     {
         $payload = [
             'quantity' => 1,
@@ -165,7 +175,7 @@ class ProductControllerUnitTest extends TestCase
 
     }
 
-    public function test_create_product_fail_with_string_price_and_quantity(Type $var = null)
+    public function test_create_product_fail_with_string_price_and_quantity()
     {
         $payload = [
             'price' => 'abc',
@@ -182,7 +192,7 @@ class ProductControllerUnitTest extends TestCase
 
     }
 
-    public function test_create_product_fail_with_decimal_quantity(Type $var = null)
+    public function test_create_product_fail_with_decimal_quantity()
     {
         $payload = [
             'price' => '   12.2',
@@ -197,7 +207,7 @@ class ProductControllerUnitTest extends TestCase
             ]]);
     }
 
-    public function test_update_product_success_with_correct_input(Type $var = null)
+    public function test_update_product_success_with_correct_input()
     {
         factory(Product::class)->create([
             'price' => ' 12.2',
@@ -214,7 +224,7 @@ class ProductControllerUnitTest extends TestCase
             );
     }
 
-    public function test_update_prodcut_fail_with_incorrect_input_datatype(Type $var = null)
+    public function test_update_prodcut_fail_with_incorrect_input_datatype()
     {
         factory(Product::class)->create([
             'price' => ' 12.2',
