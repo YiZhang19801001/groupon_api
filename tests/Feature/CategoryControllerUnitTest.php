@@ -75,8 +75,10 @@ class CategoryControllerUnitTest extends TestCase
         $response = $this->json('get', '/api/categories/1', [])
             ->assertStatus(200)
             ->assertJson([
-                ['category_id' => 1, 'name' => 'food'],
-                ['category_id' => 2, 'name' => 'drink'],
+                'categories' => [
+                    ['category_id' => 1, 'name' => 'food'],
+                    ['category_id' => 2, 'name' => 'drink'],
+                ],
             ]);
     }
 
@@ -92,8 +94,10 @@ class CategoryControllerUnitTest extends TestCase
         $response = $this->json('get', '/api/categories/2', [])
             ->assertStatus(200)
             ->assertJson([
-                ['category_id' => 1, 'name' => '食物'],
-                ['category_id' => 2, 'name' => 'drink'],
+                'categories' => [
+                    ['category_id' => 1, 'name' => '食物'],
+                    ['category_id' => 2, 'name' => 'drink'],
+                ],
             ]);
     }
 

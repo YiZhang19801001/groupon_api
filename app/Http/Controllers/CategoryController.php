@@ -8,10 +8,33 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    /**
+     * return all categories with selected language - if no description name in this language use default language as alternative
+     * @param Integer $language_id
+     * @return Response all categories
+     *
+     */
     public function index($language_id)
     {
-        $category = Category::all();
-        $categoryDescriptions = CategoryDescription::where('language_id',$language_id);
+        $response_array = array();
+        $categories = Category::all();
+
+        foreach ($categories as $category) {
+            $item = array();
+
+            $description = $category->descriptions()->where('language_id', $language_id)->first();
+            if ($description === null) {
+                $description = $category->descriptions()->first();
+
+            }
+            $item['category_id'] = $category->category_id;
+            $item['name'] = $description->name;
+
+            array_push($response_array, $item);
+        }
+
+        return response()->json(['categories' => $response_array], 200);
+
     }
     public function create(Request $request)
     {
