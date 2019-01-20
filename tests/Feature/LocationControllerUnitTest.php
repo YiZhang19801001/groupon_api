@@ -114,4 +114,79 @@ class LocationControllerUnitTest extends TestCase
                 ],
             ]);
     }
+
+    public function test_update_location_success_with_correct_iput()
+    {
+        factory(Location::class)->create([
+            'name' => 'shop 2',
+            'address' => 'address 2',
+            'telephone' => 'telephoe 2',
+            'open' => json_encode(["2019-2-23", "2019-2-19"]),
+        ]);
+
+        $payload = [
+            'name' => 'shop 1',
+            'address' => 'address 1',
+            'open' => ["2019-2-22", "2019-2-21"],
+        ];
+
+        $response = $this->json('put', '/api/locations/1', $payload)
+            ->assertStatus(200)
+            ->assertJson([
+                'location' => [
+                    'location_id' => 1,
+                    'name' => 'shop 1',
+                    'address' => 'address 1',
+                    'telephone' => 'telephoe 2',
+                    'open' => json_encode(["2019-2-22", "2019-2-21"]),
+                ],
+            ]);
+
+    }
+
+    public function test_update_location_fail_with_incorrect_requestbody()
+    {
+        factory(Location::class)->create([
+            'name' => 'shop 2',
+            'address' => 'address 2',
+            'telephone' => 'telephoe 2',
+            'open' => json_encode(["2019-2-23", "2019-2-19"]),
+        ]);
+
+        $payload = ['open' => "abc"];
+
+        $response = $this->json('put', '/api/locations/1', $payload)
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'open' => ['The open is not valid.'],
+
+                ],
+            ]);
+
+    }
+
+    public function test_update_location_fail_with_incrorect_location_id()
+    {
+        factory(Location::class)->create([
+            'name' => 'shop 2',
+            'address' => 'address 2',
+            'telephone' => 'telephoe 2',
+            'open' => json_encode(["2019-2-23", "2019-2-19"]),
+        ]);
+
+        $payload = ['name' => 'shop 1',
+            'address' => 'address 1',
+            'open' => ["2019-2-22", "2019-2-21"]];
+
+        $response = $this->json('put', '/api/locations/abc', $payload)
+            ->assertStatus(422)
+            ->assertJson([
+                'errors' => [
+                    'language_id' => ['The language id is not valid.'],
+
+                ],
+            ]);
+
+    }
 }

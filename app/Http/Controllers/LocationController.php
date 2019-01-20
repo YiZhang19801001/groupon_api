@@ -73,19 +73,40 @@ class LocationController extends Controller
     {
         // validation
         $errors = array();
-        if (!is_numeric($location_id) || !is_integer($location_id)) {
-            $errors['location_id'] = ['The language id is not valid.'];
+        if (!is_numeric($location_id) || !is_integer($location_id + 0)) {
+            $errors['language_id'] = ['The language id is not valid.'];
         }
+
         $location = Location::find($location_id);
         if ($location === null) {
             $errors['location'] = ['The location is not found.'];
+        }
+        if (isset($request->open) && !is_array($request->open)) {
+            $errors['open'] = ['The open is not valid.'];
         }
         if (count($errors) > 0) {
             return response()->json(compact('errors'), 422);
         }
 
         // update
-        $location->update($request->all());
+        $input = array();
+        if (isset($request->address)) {
+            $input['address'] = $request->address;
+        }
+
+        if (isset($request->name)) {
+            $input['name'] = $request->name;
+        }
+
+        if (isset($request->telephone)) {
+            $input['telephone'] = $request->telephone;
+        }
+
+        if (isset($request->open)) {
+            $input['open'] = json_encode($request->open);
+        }
+
+        $location->update($input);
 
         return response()->json(compact('location'), 200);
     }
