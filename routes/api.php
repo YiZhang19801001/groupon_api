@@ -26,3 +26,8 @@ Route::get('categories/{language_id}', 'CategoryController@index');
 Route::get('categories/{language_id}/{category_id}', 'CategoryController@show');
 Route::post('categories', 'CategoryController@create');
 Route::put('categories/{category_id}', 'CategoryController@update');
+
+Route::get('locations', 'LocationController@index');
+Route::get('locations/{location_id}', 'LocationController@show');
+Route::post('locations', 'LocationController@create');
+Route::put('locations/{location_id}', 'LocationController@update');
