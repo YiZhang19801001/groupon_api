@@ -52,14 +52,14 @@ class LocationController extends Controller
         ]);
         $errors = array();
         if (!isset($request->open) || !is_array($request->open)) {
-            $errors['open'] = 'The open is not valid.';
+            $errors['open'] = ['The open is not valid.'];
         }
         if (count($errors) > 0) {
             return response()->json(compact('errors'), 422);
         }
 
         // create location
-        $location = Location::create($request->only('name', 'open', 'address', 'telephone'));
+        $location = Location::create(['name' => $request->name, 'open' => json_encode($request->open), 'address' => $request->address, 'telephone' => $request->telephone]);
 
         return response()->json(compact('location'), 201);
     }
