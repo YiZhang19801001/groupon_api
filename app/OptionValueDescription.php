@@ -21,16 +21,11 @@ class OptionValueDescription extends Model
      */
     protected function setKeysForSaveQuery(\Illuminate\Database\Eloquent\Builder $query)
     {
-        $keys = $this->getKeyName();
-        if (!is_array($keys)) {
-            return parent::setKeysForSaveQuery($query);
-        }
-
-        foreach ($keys as $keyName) {
-            $query->where($keyName, '=', $this->getKeyForSaveQuery($keyName));
-        }
-
+        $query
+            ->where('option_value_id', '=', $this->getAttribute('option_value_id'))
+            ->where('language_id', '=', $this->getAttribute('language_id'));
         return $query;
+
     }
 
     /**

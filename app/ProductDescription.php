@@ -34,15 +34,9 @@ class ProductDescription extends Model
      */
     protected function setKeysForSaveQuery(\Illuminate\Database\Eloquent\Builder $query)
     {
-        $keys = $this->getKeyName();
-        if (!is_array($keys)) {
-            return parent::setKeysForSaveQuery($query);
-        }
-
-        foreach ($keys as $keyName) {
-            $query->where($keyName, '=', $this->getKeyForSaveQuery($keyName));
-        }
-
+        $query
+            ->where('product_id', '=', $this->getAttribute('product_id'))
+            ->where('language_id', '=', $this->getAttribute('language_id'));
         return $query;
     }
 
