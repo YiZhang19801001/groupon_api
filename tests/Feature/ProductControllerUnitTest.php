@@ -9,6 +9,7 @@ use App\OptionDescription;
 use App\OptionValue;
 use App\OptionValueDescription;
 use App\Product;
+use App\ProductDescription;
 use App\ProductOption;
 use App\ProductOptionValue;
 use App\ProductToCategory;
@@ -16,11 +17,6 @@ use Tests\TestCase;
 
 class ProductControllerUnitTest extends TestCase
 {
-    /**
-     * Test GET domain/api/products return full detailed product list
-     *
-     * @return void
-     */
     public function test_get_all_products()
     {
 
@@ -29,21 +25,35 @@ class ProductControllerUnitTest extends TestCase
             'sku' => 'abc123',
             'quantity' => 1,
         ]);
+        factory(ProductDescription::class)->create([
+            'product_id' => 1, 'language_id' => 1, 'name' => 'rice',
+        ]);
         factory(Product::class)->create([
             'price' => 12,
             'sku' => 'abc124',
             'quantity' => 1,
+        ]);
+        factory(ProductDescription::class)->create([
+            'product_id' => 2, 'language_id' => 1, 'name' => 'noodle',
         ]);
         factory(Product::class)->create([
             'price' => 10.8,
             'sku' => 'abc125',
             'quantity' => 1,
         ]);
+        factory(ProductDescription::class)->create([
+            'product_id' => 3, 'language_id' => 1, 'name' => 'pizza',
+        ]);
+
         factory(Product::class)->create([
             'price' => 12.8,
             'sku' => 'abc126',
             'quantity' => 1,
         ]);
+        factory(ProductDescription::class)->create([
+            'product_id' => 4, 'language_id' => 1, 'name' => 'burger',
+        ]);
+
         factory(Category::class)->create();
         factory(Category::class)->create();
 
@@ -53,6 +63,7 @@ class ProductControllerUnitTest extends TestCase
         factory(ProductToCategory::class)->create(['category_id' => 1, 'product_id' => 2]);
         factory(ProductToCategory::class)->create(['category_id' => 2, 'product_id' => 3]);
         factory(ProductToCategory::class)->create(['category_id' => 2, 'product_id' => 4]);
+
         factory(ProductOption::class)->create(['product_id' => 1, 'option_id' => 1, 'value' => '', 'required' => 1]);
         factory(ProductOption::class)->create(['product_id' => 1, 'option_id' => 2, 'value' => '', 'required' => 1]);
 
@@ -84,7 +95,7 @@ class ProductControllerUnitTest extends TestCase
                     'category_id' => 1,
                     'name' => 'category_1',
                     'products' => [
-                        ['product_id' => 1, 'price' => "10.00", 'sku' => 'abc123', 'quantity' => "1", "options" => [
+                        ['product_id' => 1, 'name' => 'rice', 'price' => "10.00", 'sku' => 'abc123', 'quantity' => "1", "options" => [
                             ['option_name' => 'How sweet', 'required' => '1', 'type' => 'radio', 'values' => [
                                 ['name' => 'mild', 'price' => '2.00'],
                                 ['name' => 'very sweet', 'price' => '3.00'],
@@ -95,15 +106,15 @@ class ProductControllerUnitTest extends TestCase
 
                             ]],
                         ]],
-                        ['product_id' => 2, 'price' => "12.00", 'sku' => 'abc124', 'quantity' => "1", "options" => []],
+                        ['product_id' => 2, 'name' => 'noodle', 'price' => "12.00", 'sku' => 'abc124', 'quantity' => "1", "options" => []],
                     ],
                 ],
                 [
                     'category_id' => 2,
                     'name' => 'category_2',
                     'products' => [
-                        ['product_id' => 3, 'price' => "10.80", 'sku' => 'abc125', 'quantity' => "1", "options" => []],
-                        ['product_id' => 4, 'price' => "12.80", 'sku' => 'abc126', 'quantity' => "1", "options" => []],
+                        ['product_id' => 3, 'name' => 'pizza', 'price' => "10.80", 'sku' => 'abc125', 'quantity' => "1", "options" => []],
+                        ['product_id' => 4, 'name' => 'burger', 'price' => "12.80", 'sku' => 'abc126', 'quantity' => "1", "options" => []],
                     ],
                 ],
             ])
@@ -112,99 +123,113 @@ class ProductControllerUnitTest extends TestCase
             ]);
 
     }
-
-    /**
-     * Test POST domain/api/proructs create correct instance in database
-     *
-     * @return void
-     */
     public function test_create_product_success_with_correct_input()
     {
-
+        Category::create();
         $payload = [
-            'price' => '12',
-            'sku' => 'abc124',
-            'quantity' => 1,
+            'category_id' => 1,
+            'product' => [
+                'price' => '12', 'sku' => 'abc123', 'quantity' => 999,
+            ],
+            'descriptions' => [['name' => 'rice', 'language_id' => 1], ['name' => '米饭', 'language_id' => 2]],
+            'options' => [[
+                'option_id' => 'new',
+                'required' => 1,
+                'value' => '',
+                'type' => 'checkbox',
+                'descriptions' => [['name' => 'size', 'language_id' => 1]],
+                'values' => [
+                    [
+                        'option_value_id' => 'new',
+                        'price' => '3.00',
+                        'quantity' => 1,
+                        'descriptions' => [
+                            ['name' => 'large', 'language_id' => 1],
+                        ],
+                    ],
+                    [
+                        'option_value_id' => 'new',
+                        'price' => '1.00',
+                        'quantity' => 1,
+                        'descriptions' => [
+                            ['name' => 'small', 'language_id' => 1],
+                        ],
+                    ],
+                ],
+            ]],
         ];
         $response = $this->json('post', '/api/products', $payload)
             ->assertStatus(201)
-            ->assertJson(['product_id' => '1', 'price' => '12.00', 'sku' => 'abc124', 'quantity' => '1']);
+            ->assertJson([
+                'category_id' => '1',
+                'product' => [
+                    'price' => '12.00', 'sku' => 'abc123', 'quantity' => '999',
+                ],
+                'descriptions' => [['name' => 'rice', 'language_id' => '1'], ['name' => '米饭', 'language_id' => '2']],
+                'options' => [[
+                    'required' => '1',
+                    'type' => 'checkbox',
+                    'descriptions' => [['name' => 'size', 'language_id' => '1']],
+                    'values' => [
+                        [
+                            'price' => '3.00',
+                            'descriptions' => [
+                                ['name' => 'large'],
+                            ],
+                        ],
+                        [
+                            'price' => '1.00',
+                            'descriptions' => [
+                                ['name' => 'small'],
+                            ],
+                        ],
+                    ],
+                ]],
+            ]);
+    }
+
+    public function test_create_product_fail_by_category_not_found()
+    {
+
+    }
+    public function test_create_product_fail_by_sku_duplicate()
+    {
 
     }
 
     public function test_create_product_fail_without_quantity()
     {
         $payload = [
-            'price' => 12,
-            'sku' => 'abc124',
+            'category_id' => 1,
+            'product' => [],
         ];
 
         $response = $this->json('post', '/api/products', $payload)
             ->assertStatus(422)
             ->assertJson(['errors' => [
-                'quantity' => ['The quantity field is required.'],
+                'product.price' => ['The product.price field is required.'],
+                'product.sku' => ['The product.sku field is required.'],
+                'product.quantity' => ['The product.quantity field is required.'],
             ]]);
 
     }
     public function test_create_product_fail_without_sku()
     {
-        $payload = [
-            'price' => 12,
-            'quantity' => 1,
-        ];
-
-        $response = $this->json('post', '/api/products', $payload)
-            ->assertStatus(422)
-            ->assertJson(['errors' => [
-                'sku' => ['The sku field is required.'],
-            ]]);
 
     }
     public function test_create_product_fail_without_price()
     {
-        $payload = [
-            'quantity' => 1,
-            'sku' => 'abc124',
-        ];
-
-        $response = $this->json('post', '/api/products', $payload)
-            ->assertStatus(422)
-            ->assertJson(['errors' => [
-                'price' => ['The price field is required.'],
-            ]]);
 
     }
 
     public function test_create_product_fail_with_string_price_and_quantity()
     {
-        $payload = [
-            'price' => 'abc',
-            'quantity' => 'abc',
-            'sku' => 'abc124',
-        ];
-
-        $response = $this->json('post', '/api/products', $payload)
-            ->assertStatus(422)
-            ->assertJson(['errors' => [
-                'price' => ['The price must be a number.'],
-                'quantity' => ['The quantity must be an integer.'],
-            ]]);
 
     }
 
     public function test_create_product_fail_with_decimal_quantity()
     {
-        $payload = [
-            'price' => '   12.2',
-            'quantity' => 12.2,
-            'sku' => 'abc124',
-        ];
 
-        $response = $this->json('post', '/api/products', $payload)
-            ->assertStatus(422)
-            ->assertJson(['errors' => [
-                'quantity' => ['The quantity must be an integer.'],
-            ]]);
     }
 
     public function test_update_product_success_with_correct_input()

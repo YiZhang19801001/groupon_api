@@ -37,8 +37,7 @@ class Product extends Model
         'viewed' => 1,
         'date_added' => '1900-10-11',
         'date_modified' => '1900-10-11',
-        'product_tags' => '',
-        'is_discount' => 1,
+
     ];
     protected $hidden = [
         'model',
@@ -68,31 +67,21 @@ class Product extends Model
         'viewed',
         'date_added',
         'date_modified',
-        'product_tags',
-        'is_discount',
+
         'category_id'];
     public $timestamps = false;
 
-    /**
-     * Get the product's price.
-     *
-     * @param  decimal  $value
-     * @return decimal toFixed(2)
-     */
     public function getPriceAttribute($value)
     {
         return number_format($value, 2);
     }
-
-    /**
-     * Get the product's options array
-     *
-     * @param void
-     * @return Array options belong to $this
-     */
     public function options()
     {
         return $this->hasMany('App\ProductOption', 'product_id', 'product_id');
     }
 
+    public function descriptions()
+    {
+        return $this->hasMany('App\ProductDescription', 'product_id', 'product_id');
+    }
 }

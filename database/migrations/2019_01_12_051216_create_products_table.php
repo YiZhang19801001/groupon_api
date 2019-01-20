@@ -46,8 +46,6 @@ class CreateProductsTable extends Migration
             $table->integer('viewed', false, true)->length(11);
             $table->dateTime('date_added');
             $table->dateTime('date_modified');
-            $table->string('product_tags');
-            $table->tinyInteger('is_discount');
 
         });
     }
