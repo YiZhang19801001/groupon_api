@@ -47,7 +47,6 @@ class Product extends Model
         'isbn',
         'mpn',
         'location',
-
         'manufacturer_id',
         'shipping',
         'points',
