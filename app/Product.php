@@ -48,7 +48,7 @@ class Product extends Model
         'mpn',
         'location',
         'stock_status_id',
-        'image',
+
         'manufacturer_id',
         'shipping',
         'points',
