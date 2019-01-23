@@ -56,7 +56,7 @@ class ProductController extends Controller
 
                     }
                     $newOption['option_name'] = $productOptionDescription->name;
-
+                    $newOption['product_option_id'] = $product_option->product_option_id;
                     $newOption['required'] = $product_option->required;
                     $newOption['type'] = $product_option->option->type;
 
@@ -73,7 +73,7 @@ class ProductController extends Controller
 
                         $newValue['name'] = $productOptionValueDescription->name;
                         $newValue['price'] = number_format($productOptionValue->price, 2);
-
+                        $newValue['product_option_value_id'] = $productOptionValue->product_option_value_id;
                         array_push($newValues, $newValue);
                     }
                     $newOption['values'] = $newValues;
