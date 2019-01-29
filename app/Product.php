@@ -66,7 +66,8 @@ class Product extends Model
         'date_added',
         'date_modified',
 
-        'category_id'];
+    ];
+
     public $timestamps = false;
 
     public function getPriceAttribute($value)
@@ -82,4 +83,9 @@ class Product extends Model
     {
         return $this->hasMany('App\ProductDescription', 'product_id', 'product_id');
     }
+    public function optionValues()
+    {
+        return $this->hasMany('App\ProductOptionValue', 'product_id', 'product_id');
+    }
+
 }

@@ -12,4 +12,9 @@ class Option extends Model
 
     protected $fillable = ['type', 'sort_order'];
 
+    public function descriptions()
+    {
+        return $this->hasMany('App\OptionDescription', 'option_id', 'option_id');
+    }
+
 }

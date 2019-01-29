@@ -333,6 +333,40 @@ class ProductControllerUnitTest extends TestCase
 
     }
 
+    public function test_show_single_product_according_to_product_id()
+    {
+        // $this->createSampleProductsWithDetails();
+        factory(Product::class)->create([
+            'price' => 10,
+            'sku' => 'abc123',
+            'quantity' => 1,
+        ]);
+        factory(ProductDescription::class)->create([
+            'product_id' => 1, 'language_id' => 1, 'name' => 'rice',
+        ]);
+        factory(ProductDescription::class)->create([
+            'product_id' => 1, 'language_id' => 2, 'name' => '米饭',
+        ]);
+        factory(Category::class)->create();
+        factory(CategoryDescription::class)->create(['category_id' => 1, 'name' => 'category_1', 'language_id' => 1]);
+        factory(CategoryDescription::class)->create(['category_id' => 1, 'name' => '主食', 'language_id' => 2]);
+        factory(ProductToCategory::class)->create(['category_id' => 1, 'product_id' => 1]);
+
+        $response = $this->json('GET', '/api/product/1', [])
+            ->assertStatus(200)
+            ->assertJson(
+                [
+                    'product' => ['product_id' => "1", 'price' => "10.00", 'sku' => 'abc123', 'quantity' => "1"],
+                    'category_id' => "1",
+                    'descriptions' => [
+                        ['language_id' => "1", 'name' => 'rice'],
+                        ['language_id' => "2", "name" => "米饭"],
+                    ],
+
+                ]
+            );
+    }
+
     public function createSampleProductsWithDetails()
     {
 

@@ -11,6 +11,7 @@ use App\Product;
 use App\ProductDescription;
 use App\ProductOption;
 use App\ProductOptionValue;
+use App\ProductToCategory;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -49,7 +50,6 @@ class ProductController extends Controller
                 $product_options = $product->options()->get();
                 foreach ($product_options as $product_option) {
                     $newOption = array();
-
                     $productOptionDescription = $product_option->optionDescriptions()->where('language_id', $language_id)->first();
                     if ($productOptionDescription === null) {
                         $productOptionDescription = $product_option->optionDescriptions()->first();
@@ -344,6 +344,37 @@ class ProductController extends Controller
 
         return response()->json($response_array, 200);
 
+    }
+
+    /**
+     * show single product according to product_id
+     * @param Integer Product_id
+     * @return Response product with details
+     */
+    public function show($product_id)
+    {
+        $responseData = array();
+        //1. fetch product
+        $product = Product::find($product_id);
+        $responseData['product'] = $product;
+        //2. add details
+        //2.1 descriptions
+        $responseData['descriptions'] = $product->descriptions()->get();
+        //2.2 category
+        $responseData['category_id'] = ProductToCategory::where('product_id', $product_id)->first()->category_id;
+        //2.3 options
+        $responseData['options'] = $product->options()->get();
+        foreach ($responseData['options'] as $value) {
+            $value['descriptions'] = $value->optionDescriptions()->get();
+        }
+
+        //2.4 option values
+        $responseData['optionValues'] = $product->optionValues()->get();
+        foreach ($responseData['optionValues'] as $value) {
+            $value['descriptions'] = $value->descriptions()->get();
+        }
+        //3. return response
+        return response()->json($responseData, 200);
     }
 
     /**

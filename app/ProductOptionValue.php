@@ -21,7 +21,7 @@ class ProductOptionValue extends Model
     ];
 
     protected $hidden = [
-        'product_option_id',
+
         'product_id',
         'option_id',
         'option_value_id',

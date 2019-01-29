@@ -11,7 +11,7 @@ class OptionValueDescription extends Model
 
     protected $fillable = ['option_value_id', 'language_id', 'option_id', 'name'];
 
-    protected $hidden = ['option_value_id', 'language_id', 'option_id'];
+    protected $hidden = ['option_value_id', 'option_id'];
 
     /**
      * Set the keys for a save update query.
