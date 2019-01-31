@@ -19,7 +19,10 @@ class OrderControllerUnitTest extends TestCase
                 ['product_id' => 1,
                     'price' => 12.80,
                     'quantity' => 2,
-                    'total' => 25.60],
+                    'total' => 25.60,
+                    'options' => [
+                        ['product_option_id' => 1, 'product_option_value_id' => 1], ['product_option_id' => 2, 'product_option_value_id' => 3],
+                    ]],
             ],
         ];
         $response = $this->json('post', '/api/orders', $payload)
@@ -37,7 +40,21 @@ class OrderControllerUnitTest extends TestCase
                     ['product_id' => 1,
                         'price' => '12.80',
                         'quantity' => 2,
-                        'total' => 25.60],
+                        'total' => 25.60,
+                        'options' => [
+                            [
+                                'order_id' => 1,
+                                'order_product_id' => 1,
+                                'product_option_id' => 1,
+                                'product_option_value_id' => 1,
+                            ],
+                            [
+                                'order_id' => 1,
+                                'order_product_id' => 1,
+                                'product_option_id' => 2,
+                                'product_option_value_id' => 3,
+                            ],
+                        ]],
                 ],
 
             ]);
