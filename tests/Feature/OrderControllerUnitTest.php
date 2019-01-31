@@ -16,10 +16,10 @@ class OrderControllerUnitTest extends TestCase
             'payment_method' => 'alipay',
             'total' => 12.8,
             'order_items' => [
-                'product_id' => 1,
-                'price' => 12.80,
-                'quantity' => 2,
-                'total' => 25.60,
+                ['product_id' => 1,
+                    'price' => 12.80,
+                    'quantity' => 2,
+                    'total' => 25.60],
             ],
         ];
         $response = $this->json('post', '/api/orders', $payload)
@@ -33,11 +33,11 @@ class OrderControllerUnitTest extends TestCase
                     'payment_method' => 'alipay',
                     'total' => '12.80',
                 ],
-                'order_product' => [
-                    'product_id' => 1,
-                    'price' => '12.80',
-                    'quantiy' => 2,
-                    'total' => 25.60,
+                'order_products' => [
+                    ['product_id' => 1,
+                        'price' => '12.80',
+                        'quantity' => 2,
+                        'total' => 25.60],
                 ],
 
             ]);
