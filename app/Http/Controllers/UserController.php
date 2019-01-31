@@ -41,7 +41,7 @@ class UserController extends Controller
             $response = ['success' => false, 'data' => 'Record doesnt exists'];
         }
 
-        return response()->json($response, 201);
+        return response()->json($response, 200);
     }
     public function register(Request $request)
     {
