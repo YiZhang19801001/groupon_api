@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Location;
 use App\Order;
 use App\OrderOption;
 use App\OrderProduct;
@@ -12,10 +13,82 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
     /**
+     * show all orders for current user
+     * @param void
+     * @return Response
+     */
+    public function index(Request $request)
+    {
+        // get logged in user
+        $user = $request->user();
+        // response order with details container
+        $responseOrders = array();
+        // Todo:: paginate
+        $orders = Order::where('customer_id', $user->user_id)->get();
+        // add details to each order
+        foreach ($orders as $order) {
+            $detailedOrder = self::makeOrder($order);
+
+            array_push($responseOrders, $detailedOrder);
+        }
+
+        return response()->json(['orders' => $responseOrders], 200);
+    }
+    /**
+     * helper function to add order products to order
+     * @param Order
+     * @return Order order with details
+     */
+    public function makeOrder($order)
+    {
+        $detailedOrder = array();
+
+        $detailedOrder["invoice_no"] = $order->invoice_no;
+        $detailedOrder["store_id"] = $order->store_id;
+        $store = Location::find($order->store_id);
+        $detailedOrder["store_name"] = $store->name;
+        $detailedOrder["picked_date"] = $order->fax;
+        $detailedOrder["create_date"] = $order->date_added;
+        $detailedOrder["payment_method"] = $order->payment_method;
+        $detailedOrder["total"] = $order->total;
+
+        $detailedOrder["order_items"] = self::fetchOrderProducts($order->order_id);
+
+        return $detailedOrder;
+    }
+    /**
+     * helper function to fetch order product for certain order
+     * @param Integer OrderId
+     * @return Array(OrderProduct)
+     */
+    public function fetchOrderProducts($order_id)
+    {
+        $orderProducts = OrderProduct::where('order_id', $order_id)->get();
+
+        foreach ($orderProducts as $orderProduct) {
+            $options = array();
+
+            $orderProduct['options'] = $options;
+        }
+
+        return $orderProducts;
+    }
+    /**
+     * helper function to fetch order product options
+     * @param Integer OrderProductId
+     * @return Array(OrderOption)
+     */
+    public function fetchOrderPorductOption($order_product_id)
+    {
+        $options = OrderOption::where('order_product_id', $order_product_id)->get();
+
+        return $options;
+    }
+    /**
      * create new order in DB
      *
      * @param Request $request
-     * @return void
+     * @return Response
      */
     public function create(Request $request)
     {
