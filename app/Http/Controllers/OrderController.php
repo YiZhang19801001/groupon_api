@@ -6,6 +6,8 @@ use App\Location;
 use App\Order;
 use App\OrderOption;
 use App\OrderProduct;
+use App\OrderStatus;
+use App\ProductDescription;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -51,7 +53,8 @@ class OrderController extends Controller
         $detailedOrder["create_date"] = $order->date_added;
         $detailedOrder["payment_method"] = $order->payment_method;
         $detailedOrder["total"] = $order->total;
-
+        $detailedOrder["status_id"] = $order->order_status_id;
+        $detailedOrder["status"] = OrderStatus::where('order_status_id', $order->order_status_id)->first()->name;
         $detailedOrder["order_items"] = self::fetchOrderProducts($order->order_id);
 
         return $detailedOrder;
@@ -67,7 +70,8 @@ class OrderController extends Controller
 
         foreach ($orderProducts as $orderProduct) {
             $options = array();
-
+            $options = OrderOption::where('order_product_id', $orderProduct->order_product_id)->get();
+            $orderProduct['name'] = ProductDescription::where('product_id', $orderProduct->product_id)->where('language_id', 2)->first()->name;
             $orderProduct['options'] = $options;
         }
 
@@ -98,7 +102,7 @@ class OrderController extends Controller
         $date_today = $today->format('y-m-d');
 
         $input = [
-            'invoice_no' => $request->invoice_no, 'store_id' => $request->store_id, 'customer_id' => $request->customer_id, 'fax' => $request->fax, 'payment_method' => $request->payment_method, 'total' => $request->total, 'date_added' => $date_today, 'date_modified' => $date_today,
+            'invoice_no' => $request->invoice_no, 'store_id' => $request->store_id, 'customer_id' => $request->customer_id, 'fax' => $request->fax, 'payment_method' => $request->payment_method, 'total' => $request->total, 'date_added' => $date_today, 'date_modified' => $date_today, 'order_status_id' => $request->order_status_id,
         ];
         $order = Order::create($input);
 

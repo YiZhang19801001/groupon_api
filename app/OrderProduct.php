@@ -20,7 +20,7 @@ class OrderProduct extends Model
     ];
 
     protected $hidden = [
-        'name',
+
         'model',
         "reward",
     ];

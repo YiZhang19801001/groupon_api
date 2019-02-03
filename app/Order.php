@@ -11,7 +11,7 @@ class Order extends Model
     public $timestamps = false;
 
     //'fax' be used as pickedDate
-    protected $fillable = ['invoice_no', 'store_id', 'customer_id', 'fax', 'payment_method', 'total', 'date_added', 'date_modified'];
+    protected $fillable = ['invoice_no', 'store_id', 'customer_id', 'fax', 'payment_method', 'total', 'date_added', 'date_modified', 'order_status_id'];
 
     protected $attributes = [
         'invoice_prefix' => "MELTIANFU",
@@ -53,7 +53,7 @@ class Order extends Model
         'shipping_method' => "",
         'shipping_code' => 1,
         'comment' => "",
-        'order_status_id' => 1,
+
         'affiliate_id' => 1,
         'commission' => 1,
         'marketing_id' => 1,
@@ -108,7 +108,6 @@ class Order extends Model
         'shipping_method',
         'shipping_code',
         'comment',
-        'order_status_id',
         'affiliate_id',
         'commission',
         'marketing_id',
