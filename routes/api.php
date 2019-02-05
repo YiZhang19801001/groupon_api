@@ -51,6 +51,7 @@ Route::group(['middleware' => ['jwt.auth', 'api-header']], function () {
 
     Route::get('orders', 'OrderController@index');
     Route::post('convert', 'OrderController@convertOrderToShoppingCartList');
+    Route::delete('order/{order_id}', 'OrderController@remove');
 
 });
 

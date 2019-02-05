@@ -302,6 +302,13 @@ class OrderController extends Controller
         return response()->json(compact("shoppingCartList"), 200);
     }
 
+    public function remove($order_id)
+    {
+        self::deleteOrder($order_id);
+        return response()->json(["message" => "order deleted"], 204);
+
+    }
+
     /**
      * delete order
      * @param Integer $oc_order_id
