@@ -70,7 +70,7 @@ class Order extends Model
 
     protected $hidden = [
         'invoice_prefix',
-        'store_name',
+
         'store_url',
         'customer_group_id',
         'firstname',
@@ -135,6 +135,14 @@ class Order extends Model
      */
     public function user()
     {
-        return $this->hasOne('App\User', 'user_id', 'customer_id');
+        return $this->hasOne('App\User', 'customer_id', 'user_id');
+    }
+    /**
+     * fetch order status
+     * @return void
+     */
+    public function status()
+    {
+        return $this->hasMany('App\OrderStatus', 'order_status_id', 'order_status_id');
     }
 }

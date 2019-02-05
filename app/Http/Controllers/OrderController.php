@@ -10,12 +10,34 @@ use App\OrderProduct;
 use App\OrderStatus;
 use App\Product;
 use App\ProductDescription;
+use App\User;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    /**
+     * fetch all orders for cPanel use
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function getAll(Request $request)
+    {
+        $orders = Order::all();
+        foreach ($orders as $order) {
+            $order["status_name"] = $order->status()->first()->name;
+            $user = User::find($order->customer_id);
+            $order["user"] = $user;
+            $store = Location::find($order->store_id);
+            $order["order_items"] = self::fetchOrderProducts($order->order_id);
+
+            $order["store_name"] = $store->name;
+        }
+
+        return response()->json(compact("orders"), 200);
+    }
     /**
      * show all orders for current user
      * @param void

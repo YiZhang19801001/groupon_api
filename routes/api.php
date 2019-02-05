@@ -56,3 +56,4 @@ Route::group(['middleware' => ['jwt.auth', 'api-header']], function () {
 });
 
 Route::post('orders', 'OrderController@create');
+Route::get('allorders', 'OrderController@getAll');
