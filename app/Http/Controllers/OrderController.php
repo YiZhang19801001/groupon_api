@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Location;
+use App\Option;
 use App\Order;
 use App\OrderOption;
 use App\OrderProduct;
 use App\OrderStatus;
+use App\Product;
 use App\ProductDescription;
 use DateTime;
 use DateTimeZone;
@@ -46,6 +48,7 @@ class OrderController extends Controller
         $detailedOrder = array();
 
         $detailedOrder["invoice_no"] = $order->invoice_no;
+        $detailedOrder["order_id"] = $order->order_id;
         $detailedOrder["store_id"] = $order->store_id;
         $store = Location::find($order->store_id);
         $detailedOrder["store_name"] = $store->name;
@@ -164,4 +167,152 @@ class OrderController extends Controller
 
         return $orderOptions;
     }
+
+    /**
+     * covert order_items into shopping cart list for front end use
+     *
+     * @param Request $request
+     * @return Response $ShoppingCartList as json object
+     */
+    public function convertOrderToShoppingCartList(Request $request)
+    {
+        $language_id = $request->input("language_id");
+        $orderItems = $request->items;
+
+        // response result container
+        $shoppingCartList = array();
+
+        // maping value
+        foreach ($orderItems as $orderItem) {
+            $orderItem = json_decode(json_encode($orderItem));
+            $newOrderItem = array();
+            // fetch product by product_id
+            $product_id = $orderItem->product_id;
+            $product = Product::find($product_id);
+            // fetch product name
+            $productDescription = $product->descriptions()->where('language_id', $language_id)->first();
+            if ($productDescription === null) {
+                $productDescription = $product->descriptions()->first();
+            }
+
+            $product['name'] = $productDescription->name;
+
+            // fetch product options
+            $options = array();
+            $product_options = $product->options()->get();
+            foreach ($product_options as $product_option) {
+                $newOption = array();
+                $productOptionDescription = $product_option->optionDescriptions()->where('language_id', $language_id)->first();
+                if ($productOptionDescription === null) {
+                    $productOptionDescription = $product_option->optionDescriptions()->first();
+
+                }
+                $newOption['option_name'] = $productOptionDescription->name;
+                $newOption['product_option_id'] = $product_option->product_option_id;
+                $newOption['required'] = $product_option->required;
+                $newOption['type'] = $product_option->option->type;
+
+                $newValues = array();
+
+                $productOptionValues = $product_option->optionValues()->get();
+                foreach ($productOptionValues as $productOptionValue) {
+                    $newValue = array();
+
+                    $productOptionValueDescription = $productOptionValue->descriptions()->where('language_id', $language_id)->first();
+                    if ($productOptionValueDescription === null) {
+                        $productOptionValueDescription = $productOptionValue->descriptions()->first();
+                    }
+
+                    $newValue['name'] = $productOptionValueDescription->name;
+                    $newValue['price'] = number_format($productOptionValue->price, 2);
+                    $newValue['product_option_value_id'] = $productOptionValue->product_option_value_id;
+                    array_push($newValues, $newValue);
+                }
+                $newOption['values'] = $newValues;
+                array_push($options, $newOption);
+
+            }
+            $product['options'] = $options;
+
+            // fetch order item choices
+            $choices = array();
+            foreach ($orderItem->options as $orderOption) {
+                $orderOption = json_decode(json_encode($orderOption));
+
+                // get value details
+                $orderItemOptionValueName = "";
+                $orderItemOptionValuePrice = "";
+                foreach ($options as $option) {
+                    foreach ($option["values"] as $optionValue) {
+                        if ($optionValue["product_option_value_id"] == $orderOption->product_option_value_id) {
+                            $orderItemOptionValueName = $optionValue["name"];
+                            $orderItemOptionValuePrice = $optionValue["price"];
+                        }
+                    }
+
+                }
+
+                // chech duplicate product option exist in $choice or not
+                $flag = false;
+                $index = 0;
+                for ($i = 0; $i < count($choices); $i++) {
+                    $choice = $choices[$i];
+                    if ($choice["productOption"] == $orderOption->product_option_id) {
+                        $flag = true;
+                        $index = $i;
+                    }
+
+                }
+
+                // if no duplicate record in $choices
+
+                if (!$flag) {
+
+                    $choice = array();
+                    $choice["productOption"] = $orderOption->product_option_id;
+                    $choice["productOptionValue"] = [
+                        "name" => $orderItemOptionValueName,
+                        "price" => $orderItemOptionValuePrice,
+                        "product_option_value_id" => $orderOption->product_option_value_id,
+                    ];
+
+                    array_push($choices, $choice);
+                } else {
+
+                    // if duplicate record find in $choices
+                    array_push($choices[$index]["productOptionValue"], [
+                        "name" => $orderItemOptionValueName,
+                        "price" => $orderItemOptionValuePrice,
+                        "product_option_value_id" => $orderOption->product_option_value_id,
+                    ]);
+                }
+
+            }
+
+            $product["choices"] = $choices;
+
+            $newOrderItem["item"] = $product;
+            $newOrderItem["quantity"] = $orderItem->quantity;
+
+            array_push($shoppingCartList, $newOrderItem);
+        }
+
+        $this->deleteOrder($request->order_id);
+
+        return response()->json(compact("shoppingCartList"), 200);
+    }
+
+    /**
+     * delete order
+     * @param Integer $oc_order_id
+     * @return Void
+     */
+    public function deleteOrder($order_id)
+    {
+        Order::destroy($order_id);
+        OrderProduct::where('order_id', $order_id)->delete();
+        OrderOption::where('order_id', $order_id)->delete();
+
+    }
+
 }

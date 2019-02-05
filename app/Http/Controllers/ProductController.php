@@ -21,8 +21,9 @@ class ProductController extends Controller
      * @param none
      * @return Response
      */
-    public function index($language_id)
+    public function index(Request $request)
     {
+        $language_id = $request->input("language_id");
         $categories = Category::all();
 
         $responseData = [];
