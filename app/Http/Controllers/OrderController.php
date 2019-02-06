@@ -18,6 +18,23 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
     /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function show($order_id)
+    {
+
+        $dbOrder = Order::find($order_id);
+        if ($dbOrder === null) {
+            return response()->json(['errors' => "can not found order"], 400);
+        }
+        $order = self::makeOrder($dbOrder);
+
+        return response()->json(compact('order'), 200);
+    }
+    /**
      * fetch all orders for cPanel use
      *
      * @param Request $request
