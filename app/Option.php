@@ -17,4 +17,9 @@ class Option extends Model
         return $this->hasMany('App\OptionDescription', 'option_id', 'option_id');
     }
 
+    public function optionValues()
+    {
+        return $this->hasMany('App\OptionValue', 'option_id', 'option_id');
+    }
+
 }
