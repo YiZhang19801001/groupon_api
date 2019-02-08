@@ -38,7 +38,6 @@ class OrderController extends Controller
     }
     /**
      * fetch all orders for cPanel use
-     *
      * @param Request $request
      * @return void
      */
