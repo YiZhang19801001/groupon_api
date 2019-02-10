@@ -14,11 +14,11 @@ class CategoryController extends Controller
      * @return Response all categories
      *
      */
-    public function index($language_id)
+    public function index(Request $request)
     {
         $response_array = array();
         $categories = Category::all();
-
+        $language_id = $request->input("language_id");
         foreach ($categories as $category) {
             $item = array();
 
