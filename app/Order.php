@@ -53,7 +53,6 @@ class Order extends Model
         'shipping_method' => "",
         'shipping_code' => 1,
         'comment' => "",
-
         'affiliate_id' => 1,
         'commission' => 1,
         'marketing_id' => 1,
@@ -70,7 +69,6 @@ class Order extends Model
 
     protected $hidden = [
         'invoice_prefix',
-
         'store_url',
         'customer_group_id',
         'firstname',
