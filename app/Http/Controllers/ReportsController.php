@@ -49,13 +49,19 @@ class ReportsController extends Controller
         // 4. sales by payment method
         $sum_by_payment = array();
         $orders_by_payment = $orders->groupby("payment_method");
-        foreach ($orders_by_payment as $orderArray) {
-            $total = 0;
-            foreach ($orderArray as $order) {
-                $total += $order->total;
+        foreach ($orders_by_payment as $key => $orderArray) {
+            $result = array();
+            $orders_by_date_added = $orderArray->groupby("date_added");
+            foreach ($orders_by_date_added as $orderArray2) {
+                $total = 0;
+                foreach ($orderArray2 as $order) {
+                    $total += $order->total;
+                }
+                array_push($result, ["date" => $orderArray2[0]->date_added, "total" => $total]);
             }
-            array_push($sum_by_payment, ["payment_method" => $orderArray[0]->payment_method, "total" => $total]);
+            array_push($sum_by_payment, ["payment_method" => $key, "data" => $result]);
         }
+        return response()->json($sum_by_payment);
 
         // 5. sales by products
         $sum_by_product = self::makeSalesByProduct($orders);
