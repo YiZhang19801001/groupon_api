@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： 127.0.0.1
--- 生成日期： 2019-02-11 07:06:09
+-- 生成日期： 2019-02-11 07:54:42
 -- 服务器版本： 10.1.36-MariaDB
 -- PHP 版本： 7.0.32
 
@@ -1236,8 +1236,8 @@ CREATE TABLE `oc_order` (
 --
 
 INSERT INTO `oc_order` (`order_id`, `invoice_no`, `invoice_prefix`, `store_id`, `store_name`, `store_url`, `customer_id`, `customer_group_id`, `firstname`, `lastname`, `email`, `telephone`, `fax`, `custom_field`, `payment_firstname`, `payment_lastname`, `payment_company`, `payment_address_1`, `payment_address_2`, `payment_city`, `payment_postcode`, `payment_country`, `payment_country_id`, `payment_zone`, `payment_zone_id`, `payment_address_format`, `payment_custom_field`, `payment_method`, `payment_code`, `shipping_firstname`, `shipping_lastname`, `shipping_company`, `shipping_address_1`, `shipping_address_2`, `shipping_city`, `shipping_postcode`, `shipping_country`, `shipping_country_id`, `shipping_zone`, `shipping_zone_id`, `shipping_address_format`, `shipping_custom_field`, `shipping_method`, `shipping_code`, `comment`, `total`, `order_status_id`, `affiliate_id`, `commission`, `marketing_id`, `tracking`, `language_id`, `currency_id`, `currency_code`, `currency_value`, `ip`, `forwarded_ip`, `user_agent`, `accept_language`, `date_added`, `date_modified`) VALUES
-(3, 123599, 'MELTIANFU', 1, '', '', 1, 1, '', '', '', '', '2019-03-04', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 2, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00'),
-(2, 123, 'MELTIANFU', 2, '', '', 1, 1, '', '', '', '', '2019-03-05', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 1, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00'),
+(3, 123599, 'MELTIANFU', 1, '', '', 1, 1, '', '', '', '', '2019-03-04', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 2, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-04 00:00:00', '2019-02-05 00:00:00'),
+(2, 123, 'MELTIANFU', 2, '', '', 1, 1, '', '', '', '', '2019-03-05', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 1, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-06 00:00:00', '2019-02-05 00:00:00'),
 (4, 123567, 'MELTIANFU', 3, '', '', 1, 1, '', '', '', '', '2019-03-04', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 2, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00'),
 (5, 123588, 'MELTIANFU', 2, '', '', 1, 1, '', '', '', '', '2019-03-04', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 3, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00');
 
