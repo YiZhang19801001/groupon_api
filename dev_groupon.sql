@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： 127.0.0.1
--- 生成日期： 2019-01-31 07:18:25
+-- 生成日期： 2019-02-11 07:06:09
 -- 服务器版本： 10.1.36-MariaDB
 -- PHP 版本： 7.0.32
 
@@ -989,7 +989,8 @@ CREATE TABLE `oc_location` (
 INSERT INTO `oc_location` (`location_id`, `name`, `address`, `telephone`, `fax`, `geocode`, `image`, `open`, `comment`) VALUES
 (1, '天府川菜馆 Yarra', '176 Toorak Road , South Yarra , VIC 3141', '(03)9078 1686', '', '', 'shop_1.jpg', '[\"2019-03-05\",\"2019-03-06\"]', ''),
 (2, '天府川菜馆 Box hill', 'Level 1, 2A Cambridge Street, Box hill, VIC 3128', '(03)9041 4318', '', '', 'shop_2.jpg', '[\"2019-03-05\",\"2019-03-06\"]', ''),
-(3, '天府川菜馆 Lonsdale Street', '149-155 Lonsdale Street, Melbourne VIC 3000', '(03)9662 2019', '', '', 'shop_3.jpg', '[\"2019-03-05\",\"2019-03-06\"]', '');
+(3, '天府川菜馆 Lonsdale Street', '149-155 Lonsdale Street, Melbourne VIC 3000', '(03)9662 2019', '', '', 'shop_3.jpg', '[\"2019-03-05\",\"2019-03-06\"]', ''),
+(4, 'Test new shop', '27 abc street', '123467', '', '', '', '[\"2019-01-29T13:00:00.000Z\",\"2019-02-13T13:00:00.000Z\"]', '');
 
 -- --------------------------------------------------------
 
@@ -1235,7 +1236,10 @@ CREATE TABLE `oc_order` (
 --
 
 INSERT INTO `oc_order` (`order_id`, `invoice_no`, `invoice_prefix`, `store_id`, `store_name`, `store_url`, `customer_id`, `customer_group_id`, `firstname`, `lastname`, `email`, `telephone`, `fax`, `custom_field`, `payment_firstname`, `payment_lastname`, `payment_company`, `payment_address_1`, `payment_address_2`, `payment_city`, `payment_postcode`, `payment_country`, `payment_country_id`, `payment_zone`, `payment_zone_id`, `payment_address_format`, `payment_custom_field`, `payment_method`, `payment_code`, `shipping_firstname`, `shipping_lastname`, `shipping_company`, `shipping_address_1`, `shipping_address_2`, `shipping_city`, `shipping_postcode`, `shipping_country`, `shipping_country_id`, `shipping_zone`, `shipping_zone_id`, `shipping_address_format`, `shipping_custom_field`, `shipping_method`, `shipping_code`, `comment`, `total`, `order_status_id`, `affiliate_id`, `commission`, `marketing_id`, `tracking`, `language_id`, `currency_id`, `currency_code`, `currency_value`, `ip`, `forwarded_ip`, `user_agent`, `accept_language`, `date_added`, `date_modified`) VALUES
-(1, 12345678, 'MELTIANFU', 1, '', '', 1, 1, '', '', '', '', '2019-03-21', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'alipay', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '12.8000', 1, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-01-31 00:00:00', '2019-01-31 00:00:00');
+(3, 123599, 'MELTIANFU', 1, '', '', 1, 1, '', '', '', '', '2019-03-04', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 2, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00'),
+(2, 123, 'MELTIANFU', 2, '', '', 1, 1, '', '', '', '', '2019-03-05', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 1, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00'),
+(4, 123567, 'MELTIANFU', 3, '', '', 1, 1, '', '', '', '', '2019-03-04', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 2, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00'),
+(5, 123588, 'MELTIANFU', 2, '', '', 1, 1, '', '', '', '', '2019-03-04', '', '', '', '', '', '', '', '', '', 1, '', 1, '', '', 'ALIPAY', '1', '', '', '', '', '', '', '', '', 1, '', 1, '', '', '', '1', '', '42.4000', 3, 1, '1.0000', 1, 'abc', 1, 1, 'AUD', '1.10000000', '', '', '', '', '2019-02-05 00:00:00', '2019-02-05 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -1269,6 +1273,15 @@ CREATE TABLE `oc_order_option` (
   `type` varchar(32) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+--
+-- 转存表中的数据 `oc_order_option`
+--
+
+INSERT INTO `oc_order_option` (`order_option_id`, `order_id`, `order_product_id`, `product_option_id`, `product_option_value_id`, `name`, `value`, `type`) VALUES
+(1, 2, 3, 1, 2, '', '', ''),
+(2, 2, 3, 2, 6, '', '', ''),
+(3, 2, 3, 2, 5, '', '', '');
+
 -- --------------------------------------------------------
 
 --
@@ -1287,6 +1300,18 @@ CREATE TABLE `oc_order_product` (
   `tax` decimal(15,4) NOT NULL DEFAULT '0.0000',
   `reward` int(8) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `oc_order_product`
+--
+
+INSERT INTO `oc_order_product` (`order_product_id`, `order_id`, `product_id`, `name`, `model`, `quantity`, `price`, `total`, `tax`, `reward`) VALUES
+(1, 2, 3, '', '', 1, '12.8000', '12.8000', '0.0000', 0),
+(2, 2, 2, '', '', 1, '12.8000', '12.8000', '0.0000', 0),
+(3, 2, 1, '', '', 1, '16.8000', '16.8000', '0.0000', 0),
+(4, 3, 3, '', '', 1, '12.8000', '12.8000', '0.0000', 0),
+(5, 3, 2, '', '', 1, '12.8000', '12.8000', '0.0000', 0),
+(6, 3, 1, '', '', 1, '16.8000', '16.8000', '0.0000', 0);
 
 -- --------------------------------------------------------
 
@@ -1357,6 +1382,17 @@ CREATE TABLE `oc_order_status` (
   `language_id` int(11) NOT NULL,
   `name` varchar(32) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- 转存表中的数据 `oc_order_status`
+--
+
+INSERT INTO `oc_order_status` (`order_status_id`, `language_id`, `name`) VALUES
+(1, 1, 'customer saved'),
+(2, 1, 'pending'),
+(3, 1, 'complete'),
+(4, 1, 'cancel'),
+(5, 1, 'refund');
 
 -- --------------------------------------------------------
 
@@ -1451,9 +1487,9 @@ INSERT INTO `oc_product` (`product_id`, `model`, `sku`, `upc`, `ean`, `jan`, `is
 (16, '', '', '', '', '', '', '', '', 99, 150, '/images/products/16.jpeg', 0, 1, '10.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
 (17, '', '', '', '', '', '', '', '', 99, 150, '/images/products/17.jpeg', 0, 1, '10.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
 (18, '', '', '', '', '', '', '', '', 99, 150, '/images/products/18.jpeg', 0, 1, '10.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
-(1, '', '', '', '', '', '', '', '', 99, 150, '/images/products/1.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
-(2, '', '', '', '', '', '', '', '', 99, 150, '/images/products/2.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
-(3, '', '', '', '', '', '', '', '', 99, 150, '/images/products/3.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
+(1, '', '', '', '', '', '', '', '', 10, 150, '/images/products/1.jpeg', 0, 1, '13.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
+(2, '', '', '', '', '', '', '', '', 140, 150, '/images/products/2.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
+(3, '', '', '', '', '', '', '', '', 70, 150, '/images/products/3.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
 (4, '', '', '', '', '', '', '', '', 99, 150, '/images/products/4.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
 (5, '', '', '', '', '', '', '', '', 99, 150, '/images/products/5.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
 (6, '', '', '', '', '', '', '', '', 99, 150, '/images/products/6.jpeg', 0, 1, '12.8000', 0, 0, '0000-00-00', '0.00000000', 0, '0.00000000', '0.00000000', '0.00000000', 0, 1, 1, 0, 0, 0, '2019-01-22 00:00:00', '2019-01-22 00:00:00'),
@@ -2171,7 +2207,7 @@ CREATE TABLE `oc_user` (
 --
 
 INSERT INTO `oc_user` (`user_id`, `user_group_id`, `username`, `password`, `api_token`, `salt`, `firstname`, `lastname`, `email`, `image`, `code`, `ip`, `status`, `date_added`) VALUES
-(1, 1, 'admin', '$2y$10$2fIZANKxK9OWfPYsAHTC6OCCzCH.nY1FtzH/.azL3yO0QEsvM7wz2', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMFwvYXBpXC91c2VyXC9sb2dpbiIsImlhdCI6MTU0ODkxMzU1NiwiZXhwIjoxNTQ4OTE3MTU2LCJuYmYiOjE1NDg5MTM1NTYsImp0aSI6IktkR0JuazI3R2xTelJlcDgiLCJzdWIiOjEsInBydiI6Ijg3ZTBhZjFlZjlmZDE1ODEyZmRlYzk3MTUzYTE0ZTBiMDQ3NTQ2YWEifQ.1LXHuFq2inKAT4oCVcVkZw5b3BVt_r9MLzerIYqO3uo', '', '', '', 'admin@admin.com', '', '', '', 0, '1900-10-10 00:00:00');
+(1, 1, 'admin', '$2y$10$2fIZANKxK9OWfPYsAHTC6OCCzCH.nY1FtzH/.azL3yO0QEsvM7wz2', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMFwvYXBpXC91c2VyXC9sb2dpbiIsImlhdCI6MTU0OTMzMTEyNywiZXhwIjoxNTQ5MzM0NzI3LCJuYmYiOjE1NDkzMzExMjcsImp0aSI6IjZITWdyV2tRQ3NETzQyVTQiLCJzdWIiOjEsInBydiI6Ijg3ZTBhZjFlZjlmZDE1ODEyZmRlYzk3MTUzYTE0ZTBiMDQ3NTQ2YWEifQ.l992sYftHsjzoQ-7KzSv3CLIw13qWGNdhKZNuf3HoQI', '', '', '', 'admin@admin.com', '', '', '', 0, '1900-10-10 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -3392,7 +3428,7 @@ ALTER TABLE `oc_length_class`
 -- 使用表AUTO_INCREMENT `oc_location`
 --
 ALTER TABLE `oc_location`
-  MODIFY `location_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `location_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- 使用表AUTO_INCREMENT `oc_manufacturer`
@@ -3434,7 +3470,7 @@ ALTER TABLE `oc_option_value`
 -- 使用表AUTO_INCREMENT `oc_order`
 --
 ALTER TABLE `oc_order`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- 使用表AUTO_INCREMENT `oc_order_history`
@@ -3446,13 +3482,13 @@ ALTER TABLE `oc_order_history`
 -- 使用表AUTO_INCREMENT `oc_order_option`
 --
 ALTER TABLE `oc_order_option`
-  MODIFY `order_option_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_option_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- 使用表AUTO_INCREMENT `oc_order_product`
 --
 ALTER TABLE `oc_order_product`
-  MODIFY `order_product_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- 使用表AUTO_INCREMENT `oc_order_recurring`
@@ -3476,7 +3512,7 @@ ALTER TABLE `oc_order_shipment`
 -- 使用表AUTO_INCREMENT `oc_order_status`
 --
 ALTER TABLE `oc_order_status`
-  MODIFY `order_status_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_status_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- 使用表AUTO_INCREMENT `oc_order_total`
@@ -3644,7 +3680,7 @@ ALTER TABLE `oc_upload`
 -- 使用表AUTO_INCREMENT `oc_user`
 --
 ALTER TABLE `oc_user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- 使用表AUTO_INCREMENT `oc_user_group`
