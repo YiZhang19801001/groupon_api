@@ -35,6 +35,17 @@ class LocationController extends Controller
 
         return response()->json(compact('locations'), 200);
     }
+    public function show($location_id)
+    {
+        $shop = Location::find($location_id);
+        if ($shop->open !== null) {
+            $shop->open = json_decode($shop->open);
+        } else {
+            $shop->open = [];
+        }
+
+        return response()->json(compact("shop"), 200);
+    }
 
     /**
      * create location

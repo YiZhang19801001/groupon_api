@@ -42,7 +42,6 @@ Route::group(['middleware' => ['jwt.auth', 'api-header']], function () {
 
     // all routes to protected resources are registered here
     Route::get('users/list', function () {
-
         $users = App\User::all();
         $response = ['success' => true, 'data' => $users];
         return response()->json($response, 201);
