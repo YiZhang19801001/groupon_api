@@ -61,7 +61,6 @@ class ReportsController extends Controller
             }
             array_push($sum_by_payment, ["payment_method" => $key, "data" => $result]);
         }
-        return response()->json($sum_by_payment);
 
         // 5. sales by products
         $sum_by_product = self::makeSalesByProduct($orders);
