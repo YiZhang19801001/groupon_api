@@ -24,67 +24,9 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $language_id = $request->input("language_id");
-        $categories = Category::all();
+        $status = isset($request->product_status) ? $request->product_status : 0;
 
-        $responseData = [];
-
-        foreach ($categories as $category) {
-            $dto = [];
-            $dto['category_id'] = $category->category_id;
-
-            // find category for $language_id matching language
-            $categoryDescription = $category->descriptions()->where('language_id', $language_id)->first();
-            if ($categoryDescription === null) { // if no matching language record provide default validate value for it.
-                $categoryDescription = $category->descriptions()->first();
-            }
-            $dto['name'] = $categoryDescription->name;
-
-            $products = $category->products()->get();
-            foreach ($products as $product) {
-                $productDescription = $product->descriptions()->where('language_id', $language_id)->first();
-                if ($productDescription === null) {
-                    $productDescription = $product->descriptions()->first();
-                }
-                $product['name'] = $productDescription->name;
-
-                $options = array();
-                $product_options = $product->options()->get();
-                foreach ($product_options as $product_option) {
-                    $newOption = array();
-                    $productOptionDescription = $product_option->optionDescriptions()->where('language_id', $language_id)->first();
-                    if ($productOptionDescription === null) {
-                        $productOptionDescription = $product_option->optionDescriptions()->first();
-
-                    }
-                    $newOption['option_name'] = $productOptionDescription->name;
-                    $newOption['product_option_id'] = $product_option->product_option_id;
-                    $newOption['required'] = $product_option->required;
-                    $newOption['type'] = $product_option->option->type;
-
-                    $newValues = array();
-
-                    $productOptionValues = $product_option->optionValues()->get();
-                    foreach ($productOptionValues as $productOptionValue) {
-                        $newValue = array();
-
-                        $productOptionValueDescription = $productOptionValue->descriptions()->where('language_id', $language_id)->first();
-                        if ($productOptionValueDescription === null) {
-                            $productOptionValueDescription = $productOptionValue->descriptions()->first();
-                        }
-
-                        $newValue['name'] = $productOptionValueDescription->name;
-                        $newValue['price'] = number_format($productOptionValue->price, 2);
-                        $newValue['product_option_value_id'] = $productOptionValue->product_option_value_id;
-                        array_push($newValues, $newValue);
-                    }
-                    $newOption['values'] = $newValues;
-                    array_push($options, $newOption);
-                }
-                $product['options'] = $options;
-            }
-            $dto['products'] = $products;
-            array_push($responseData, $dto);
-        }
+        $responseData = self::getProductsList($language_id, $status);
 
         return response()->json($responseData, 200);
     }
@@ -202,6 +144,7 @@ class ProductController extends Controller
     public function update(Request $request, $product_id)
     {
         //1. validation
+
         $errors = $this->validateRequest($request);
         $request->product = json_decode(json_encode($request->product));
 
@@ -225,6 +168,7 @@ class ProductController extends Controller
         $product->price = $request->product->price;
         $product->sku = $request->product->sku;
         $product->quantity = $request->product->quantity;
+        $product->status = $request->product->status;
         $product->save();
 
         //3. update oc_product_description [multiple descriptions should be created, as user may update all names for different languages]
@@ -338,10 +282,12 @@ class ProductController extends Controller
         }
 
         // mapping value for response body;
-        $response_array['category_id'] = $request->category_id;
-        $response_array['product'] = ['price' => number_format($product->price, 2), 'sku' => $product->sku, 'quantity' => $product->quantity];
-        $response_array['descriptions'] = $productDescriptions;
-        $response_array['options'] = $options;
+        // $response_array['category_id'] = $request->category_id;
+        // $response_array['product'] = ['price' => number_format($product->price, 2), 'sku' => $product->sku, 'quantity' => $product->quantity];
+        // $response_array['descriptions'] = $productDescriptions;
+        // $response_array['options'] = $options;
+        $status = $status === 1 ? 0 : 1;
+        $response_array = self::getProductsList($language_id, $status);
 
         return response()->json($response_array, 200);
 
@@ -376,6 +322,79 @@ class ProductController extends Controller
         }
         //3. return response
         return response()->json($responseData, 200);
+    }
+
+    /**
+     * helper function fetch all products list from DB
+     *
+     * @param integer $language_id
+     * @param integer $status
+     * @return Array
+     */
+    public function getProductsList($language_id, $status)
+    {
+        $categories = Category::all();
+
+        $responseData = [];
+
+        foreach ($categories as $category) {
+            $dto = [];
+            $dto['category_id'] = $category->category_id;
+
+            // find category for $language_id matching language
+            $categoryDescription = $category->descriptions()->where('language_id', $language_id)->first();
+            if ($categoryDescription === null) { // if no matching language record provide default validate value for it.
+                $categoryDescription = $category->descriptions()->first();
+            }
+            $dto['name'] = $categoryDescription->name;
+
+            $products = $category->products()->where("status", $status)->get();
+            foreach ($products as $product) {
+                $productDescription = $product->descriptions()->where('language_id', $language_id)->first();
+                if ($productDescription === null) {
+                    $productDescription = $product->descriptions()->first();
+                }
+                $product['name'] = $productDescription->name;
+
+                $options = array();
+                $product_options = $product->options()->get();
+                foreach ($product_options as $product_option) {
+                    $newOption = array();
+                    $productOptionDescription = $product_option->optionDescriptions()->where('language_id', $language_id)->first();
+                    if ($productOptionDescription === null) {
+                        $productOptionDescription = $product_option->optionDescriptions()->first();
+
+                    }
+                    $newOption['option_name'] = $productOptionDescription->name;
+                    $newOption['product_option_id'] = $product_option->product_option_id;
+                    $newOption['required'] = $product_option->required;
+                    $newOption['type'] = $product_option->option->type;
+
+                    $newValues = array();
+
+                    $productOptionValues = $product_option->optionValues()->get();
+                    foreach ($productOptionValues as $productOptionValue) {
+                        $newValue = array();
+
+                        $productOptionValueDescription = $productOptionValue->descriptions()->where('language_id', $language_id)->first();
+                        if ($productOptionValueDescription === null) {
+                            $productOptionValueDescription = $productOptionValue->descriptions()->first();
+                        }
+
+                        $newValue['name'] = $productOptionValueDescription->name;
+                        $newValue['price'] = number_format($productOptionValue->price, 2);
+                        $newValue['product_option_value_id'] = $productOptionValue->product_option_value_id;
+                        array_push($newValues, $newValue);
+                    }
+                    $newOption['values'] = $newValues;
+                    array_push($options, $newOption);
+                }
+                $product['options'] = $options;
+            }
+            $dto['products'] = $products;
+            array_push($responseData, $dto);
+        }
+        return $responseData;
     }
 
     /**
@@ -418,6 +437,22 @@ class ProductController extends Controller
             return $errors;
         }
 
+    }
+
+    /**
+     *
+     */
+    public function switchProductStatus(Request $request, $product_id)
+    {
+
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
+        $product = Product::find($product_id);
+        $request->product = json_decode(json_encode($request->product));
+        $product->status = $request->product->status;
+        $product->save();
+        $status = $request->product->status === 1 ? 0 : 1;
+        $response_array = self::getProductsList($language_id, $status);
+        return response()->json($response_array, 200);
     }
 
 }

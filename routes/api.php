@@ -21,6 +21,7 @@ Route::get('product/{product_id}', 'ProductController@show');
 Route::get('products', 'ProductController@index');
 Route::post('products', 'ProductController@create');
 Route::put('products/{product_id}', 'ProductController@update');
+Route::patch('products/{product_id}', 'ProductController@switchProductStatus');
 
 Route::get('categories', 'CategoryController@index');
 Route::get('categories/{language_id}/{category_id}', 'CategoryController@show');
