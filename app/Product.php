@@ -61,7 +61,6 @@ class Product extends Model
         'subtract',
         'minimum',
         'sort_order',
-        'status',
         'viewed',
         'date_added',
         'date_modified',

@@ -27,8 +27,11 @@ class CategoryController extends Controller
                 $description = $category->descriptions()->first();
 
             }
+
+            $count = $category->products()->count();
             $item['category_id'] = $category->category_id;
             $item['name'] = $description->name;
+            $item["number_of_products"] = $count;
 
             array_push($response_array, $item);
         }
@@ -56,8 +59,8 @@ class CategoryController extends Controller
     public function create(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required',
-            'language_id' => 'required|integer',
+            'chinese_name' => 'required',
+            'english_name' => 'required',
         ]);
 
         $categoryDescriptions = CategoryDescription::where('name', $request->name)->get();
@@ -66,9 +69,10 @@ class CategoryController extends Controller
         }
 
         $category = Category::create();
-        $categoryDescription = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->name, 'language_id' => $request->language_id]);
+        $categoryDescription1 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->chinese_name, 'language_id' => 1]);
+        $categoryDescription2 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->english_name, 'language_id' => 2]);
 
-        return response()->json(['category_id' => $category->category_id, 'name' => $categoryDescription->name], 201);
+        return response()->json(['category_id' => $category->category_id, 'cn' => $categoryDescription1, 'en' => $categoryDescription2], 201);
 
     }
 
