@@ -39,101 +39,61 @@ class ProductController extends Controller
     public function create(Request $request)
     {
         //1. validation
-        $validatedData = $request->validate([
-            'category_id' => 'required|integer',
-        ]);
+        // $validatedData = $request->validate([
+        //     'category_id' => 'required|integer',
+        // ]);
 
-        $errors = $this->validateRequest($request);
+        $errors = array();
+        // $errors = $this->validateRequest($request);
 
-        $request->product = json_decode(json_encode($request->product));
+        $product = json_decode(json_encode($request->product));
 
         //1.1 validate product.sku duplication
-        if (isset($request->product->sku)) {
-            $row = Product::where('sku', $request->product->sku)->get();
-            if (count($row) > 0) {
-                $errors['product.sku'] = ['The product sku is duplicate in database.'];
-            }
-        }
+        // if (isset($request->product->sku)) {
+        //     $row = Product::where('sku', $request->product->sku)->get();
+        //     if (count($row) > 0) {
+        //         $errors['product.sku'] = ['The product sku is duplicate in database.'];
+        //     }
+        // }
 
         if (count($errors) > 0) {
             return response()->json(compact('errors'), 422);
         }
 
-        // create product with details and make response body
-        $response_array = array();
+        $category = json_decode(json_encode($request->category));
+        $category_id = $category->category_id;
         //2. create oc_product
-        $product = Product::create(['price' => $request->product->price, 'sku' => $request->product->sku, 'quantity' => $request->product->quantity]);
+        $newProduct = Product::create(['price' => $product->price, 'quantity' => $product->quantity, "sort_order" => $product->sort_order, "stock_status_id" => $product->stock_status_id]);
 
+        $product_id = $newProduct->product_id;
         //3. create oc_product_description [multiple descriptions should be created, as user may entry all names for different languages]
-        $productDescriptions = array();
-        foreach ($request->descriptions as $productDescription) {
-            $productDescription = json_decode(json_encode($productDescription));
-            $newProductDescription = ProductDescription::create(['product_id' => $product->product_id, 'language_id' => $productDescription->language_id, 'name' => $productDescription->name]);
-            array_push($productDescriptions, $newProductDescription);
-        }
+
+        $descriptionCn = ProductDescription::create(['product_id' => $product_id, 'language_id' => 2, 'name' => $product->chinese_name]);
+        $descriptionEn = ProductDescription::create(['product_id' => $product_id, 'language_id' => 1, 'name' => $product->english_name]);
 
         //4. create options for product
-        $options = array();
-        foreach ($request->options as $option) {
-            $option = json_decode(json_encode($option));
-            $option_array = array();
-            //4.1 create oc_option if no exsiting option
-            if ($option->option_id === 'new') {
-                $newOption = Option::create(['type' => $option->type, 'sort_order' => 1]);
-                $option->option_id = $newOption->option_id;
-            }
-            $option_array['option_id'] = $option->option_id;
-            $option_array['type'] = $option->type;
-            //4.2 create oc_option_description
-            $optionDescriptions = array();
-            foreach ($option->descriptions as $optionDescription) {
-                $optionDescription = json_decode(json_encode($optionDescription));
 
-                $newOptionDescription = OptionDescription::create(['option_id' => $option->option_id, 'language_id' => $optionDescription->language_id, 'name' => $optionDescription->name]);
-                array_push($optionDescriptions, ['name' => $newOptionDescription->name, 'language_id' => $newOptionDescription->language_id]);
-            }
-            $option_array['descriptions'] = $optionDescriptions;
+        if (isset($request->options)) {
+            foreach ($request->options as $option) {
+                $option = json_decode(json_encode($option));
 
-            //4.3 create oc_product_option
-            $productOption = ProductOption::create(['product_id' => $product->product_id, 'option_id' => $option->option_id, 'value' => isset($option->value) ? $option->value : '', 'required' => $option->required]);
-            $option_array['required'] = $productOption->required;
-            $option_array['value'] = $productOption->value;
-
-            $optionValues = array();
-            // create option_values
-            foreach ($option->values as $value) {
-                $value = json_decode(json_encode($value));
-                //4.4 create oc_option_value
-                if ($value->option_value_id === 'new') {
-                    $newOptionValue = OptionValue::create(['option_id' => $option->option_id]);
-                    $value->option_value_id = $newOptionValue->option_value_id;
+                //4.1 create oc_product_option
+                $productOption = ProductOption::create(['product_id' => $product_id, 'option_id' => $option->option_id, 'value' => isset($option->value) ? $option->value : '', 'required' => isset($option->required) ? $option->required : 1]);
+                // create option_values
+                foreach ($option->values as $value) {
+                    $value = json_decode(json_encode($value));
+                    //4.6 create oc_product_option_value
+                    $productOptionValue = ProductOptionValue::create(['product_option_id' => $productOption->product_option_id, 'product_id' => $product_id, 'option_id' => $option->option_id, 'option_value_id' => $value->option_value_id, 'quantity' => isset($value->quantity) ? $value->quantity : 999, 'price' => isset($value->price) ? $value->price : 0]);
                 }
-                //4.5 create oc_option_value_description
-                $optionValueDescriptions = array();
-                foreach ($value->descriptions as $optionValueDescription) {
-                    $optionValueDescription = json_decode(json_encode($optionValueDescription));
-                    $newOptionValueDescription = OptionValueDescription::create(['option_value_id' => $value->option_value_id, 'language_id' => $optionValueDescription->language_id, 'option_id' => $option->option_id, 'name' => $optionValueDescription->name]);
-
-                    array_push($optionValueDescriptions, ['name' => $newOptionValueDescription->name, 'language_id' => $newOptionValueDescription->language_id]);
-                }
-
-                //4.6 create oc_product_option_value
-                $productOptionValue = ProductOptionValue::create(['product_option_id' => $productOption->product_option_id, 'product_id' => $product->product_id, 'option_id' => $option->option_id, 'option_value_id' => $value->option_value_id, 'quantity' => isset($value->quantity) ? $value->quantity : 999, 'price' => $value->price]);
-                array_push($optionValues, ['option_value_id' => $productOptionValue->option_value_id, 'price' => number_format($productOptionValue->price, 2), 'quantity' => $productOptionValue->quantity, 'descriptions' => $optionValueDescriptions]);
             }
 
-            $option_array['values'] = $optionValues;
-
-            array_push($options, $option_array);
         }
 
-        // mapping value for response body;
-        $response_array['category_id'] = $request->category_id;
-        $response_array['product'] = ['price' => number_format($product->price, 2), 'sku' => $product->sku, 'quantity' => $product->quantity];
-        $response_array['descriptions'] = $productDescriptions;
-        $response_array['options'] = $options;
+        ProductToCategory::create(['product_id' => $product_id, "category_id" => $category_id]);
 
-        return response()->json($response_array, 201);
+        $product = self::getSingleProduct($product_id);
+
+        return response()->json(compact("product"), 201);
     }
 
     /**
@@ -281,11 +241,6 @@ class ProductController extends Controller
             array_push($options, $option_array);
         }
 
-        // mapping value for response body;
-        // $response_array['category_id'] = $request->category_id;
-        // $response_array['product'] = ['price' => number_format($product->price, 2), 'sku' => $product->sku, 'quantity' => $product->quantity];
-        // $response_array['descriptions'] = $productDescriptions;
-        // $response_array['options'] = $options;
         $status = $status === 1 ? 0 : 1;
         $response_array = self::getProductsList($language_id, $status);
 
@@ -300,28 +255,37 @@ class ProductController extends Controller
      */
     public function show($product_id)
     {
+
+        $responseData = self::getSingleProduct($product_id);
+        //3. return response
+        return response()->json($responseData, 200);
+    }
+
+    public function getSingleProduct($product_id)
+    {
         $responseData = array();
-        //1. fetch product
+//1. fetch product
         $product = Product::find($product_id);
         $responseData['product'] = $product;
-        //2. add details
+//2. add details
         //2.1 descriptions
         $responseData['descriptions'] = $product->descriptions()->get();
-        //2.2 category
+//2.2 category
         $responseData['category_id'] = ProductToCategory::where('product_id', $product_id)->first()->category_id;
-        //2.3 options
+//2.3 options
         $responseData['options'] = $product->options()->get();
         foreach ($responseData['options'] as $value) {
             $value['descriptions'] = $value->optionDescriptions()->get();
         }
 
-        //2.4 option values
+//2.4 option values
         $responseData['optionValues'] = $product->optionValues()->get();
         foreach ($responseData['optionValues'] as $value) {
             $value['descriptions'] = $value->descriptions()->get();
         }
-        //3. return response
-        return response()->json($responseData, 200);
+
+        return $responseData;
+
     }
 
     /**
@@ -456,3 +420,23 @@ class ProductController extends Controller
     }
 
 }
+
+/**
+ *
+ */
+
+//4.1 create oc_option if no exsiting option
+// Todo::
+// if ($option->option_id === 'new') {
+//     $newOption = Option::create(['type' => $option->type, 'sort_order' => 1]);
+//     $option->option_id = $newOption->option_id;
+// }
+//4.2 create oc_option_description
+// $optionDescriptions = array();
+// foreach ($option->descriptions as $optionDescription) {
+//     $optionDescription = json_decode(json_encode($optionDescription));
+
+//     $newOptionDescription = OptionDescription::create(['option_id' => $option->option_id, 'language_id' => $optionDescription->language_id, 'name' => $optionDescription->name]);
+//     array_push($optionDescriptions, ['name' => $newOptionDescription->name, 'language_id' => $newOptionDescription->language_id]);
+// }
+// $option_array['descriptions'] = $optionDescriptions;

@@ -8,16 +8,16 @@ class Product extends Model
 {
     protected $table = 'oc_product';
     protected $primaryKey = 'product_id';
-    protected $fillable = ['price', 'sku', 'quantity'];
+    protected $fillable = ['price', 'quantity', 'sort_order', "stock_status_id"];
     protected $attributes = [
         'model' => '',
+        "sku" => "",
         'upc' => '',
         'ean' => '',
         'jan' => '',
         'isbn' => '',
         'mpn' => '',
         'location' => '',
-        'stock_status_id' => 0,
         'image' => '',
         'manufacturer_id' => 0,
         'shipping' => 1,
@@ -32,7 +32,6 @@ class Product extends Model
         'length_class_id' => 0,
         'subtract' => 0,
         'minimum' => 1,
-        'sort_order' => 1,
         'status' => 1,
         'viewed' => 1,
         'date_added' => '1900-10-11',
