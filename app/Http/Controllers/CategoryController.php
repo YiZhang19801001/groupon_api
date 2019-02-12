@@ -16,26 +16,10 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $response_array = array();
-        $categories = Category::all();
-        $language_id = $request->input("language_id");
-        foreach ($categories as $category) {
-            $item = array();
 
-            $description = $category->descriptions()->where('language_id', $language_id)->first();
-            if ($description === null) {
-                $description = $category->descriptions()->first();
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
 
-            }
-
-            $count = $category->products()->count();
-            $item['category_id'] = $category->category_id;
-            $item['name'] = $description->name;
-            $item["number_of_products"] = $count;
-
-            array_push($response_array, $item);
-        }
-
+        $response_array = self::getCategoryList($language_id);
         return response()->json(['categories' => $response_array], 200);
 
     }
@@ -78,19 +62,57 @@ class CategoryController extends Controller
 
     public function update(Request $request, $category_id)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'language_id' => 'required|integer',
-        ]);
+        // $validatedData = $request->validate([
+        //     'name' => 'required',
+        //     'language_id' => 'required|integer',
+        // ]);
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
 
-        $categoryDescription = CategoryDescription::where('category_id', $category_id)->where('language_id', $request->language_id)->first();
+        $category = Category::find($category_id);
 
-        if (!$categoryDescription) {
+        if (!$category) {
             return response()->json(['errors' => ['Messages' => 'This category can not be found.']], 400);
         }
 
-        $categoryDescription->update($request->all());
+        $categoryDescription1 = CategoryDescription::where("category_id", $category_id)->where("language_id", 1)->first();
+        $categoryDescription1->name = $request->english_name;
+        $categoryDescription1->save();
 
-        return response()->json(['category_id' => $categoryDescription->category_id, 'name' => $categoryDescription->name], 200);
+        $categoryDescription2 = CategoryDescription::where("category_id", $category_id)->where("language_id", 2)->first();
+        $categoryDescription2->name = $request->chinese_name;
+        $categoryDescription2->save();
+
+        $response_array = self::getCategoryList($language_id);
+        return response()->json($response_array, 200);
     }
+
+    public function getCategoryList($language_id)
+    {
+        $response_array = array();
+        $categories = Category::all();
+
+        foreach ($categories as $category) {
+            $item = array();
+
+            $description = $category->descriptions()->where('language_id', $language_id)->first();
+            if ($description === null) {
+                $description = $category->descriptions()->first();
+
+            }
+
+            $description2 = $category->descriptions()->where('language_id', '!=', $language_id)->first();
+
+            $count = $category->products()->count();
+            $item['category_id'] = $category->category_id;
+            $item['name'] = $description->name;
+            $item['other_name'] = $description2->name;
+            $item["number_of_products"] = $count;
+
+            array_push($response_array, $item);
+        }
+
+        return $response_array;
+
+    }
+
 }
