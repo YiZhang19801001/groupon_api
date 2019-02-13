@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Location;
 use App\Order;
 use App\OrderProduct;
+use App\Product;
 use Illuminate\Http\Request;
 
 class ReportsController extends Controller
 {
     public function summary(Request $request)
     {
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
         $date_start = $request->input("date_start");
         $date_end = $request->input("date_end");
 
@@ -27,12 +30,15 @@ class ReportsController extends Controller
         // 2. sales by store
         $sum_by_store = array();
         $orders_by_store = $orders->groupby("store_id");
+
         foreach ($orders_by_store as $orderArray) {
             $total = 0;
+            $store_id = $orderArray[0]->store_id;
+            $name = Location::find($store_id)->name;
             foreach ($orderArray as $order) {
                 $total += $order->total;
             }
-            array_push($sum_by_store, ["store_id" => $orderArray[0]->store_id, "total" => $total]);
+            array_push($sum_by_store, ["store_id" => $store_id, "store_name" => $name, "total" => $total]);
         }
 
         // 3. sales by date
@@ -63,7 +69,7 @@ class ReportsController extends Controller
         }
 
         // 5. sales by products
-        $sum_by_product = self::makeSalesByProduct($orders);
+        $sum_by_product = self::makeSalesByProduct($orders, $language_id);
 
         // 6. sales by customer
         $sum_by_customer = array();
@@ -86,8 +92,9 @@ class ReportsController extends Controller
         return response()->json(compact("summary"), 200);
     }
 
-    public function makeSalesByProduct($orders)
+    public function makeSalesByProduct($orders, $language_id)
     {
+
         $array = array();
         $order_ids = $orders->pluck('order_id');
 
@@ -95,10 +102,12 @@ class ReportsController extends Controller
 
         foreach ($order_products as $orderArray) {
             $total = 0;
+            $product_id = $orderArray[0]->product_id;
+            $product_name = Product::find($product_id)->descriptions()->where("language_id", $language_id)->first()->name;
             foreach ($orderArray as $order) {
                 $total += $order->total;
             }
-            array_push($array, ["product" => $orderArray[0]->product_id, "total" => $total]);
+            array_push($array, ["product" => $product_id, "product_name" => $product_name, "total" => $total]);
 
         }
 
