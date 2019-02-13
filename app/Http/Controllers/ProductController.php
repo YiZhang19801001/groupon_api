@@ -312,7 +312,7 @@ class ProductController extends Controller
             }
             $dto['name'] = $categoryDescription->name;
 
-            $products = $category->products()->where("status", $status)->where("quantity",">",0)->get();
+            $products = $category->products()->where("status", $status)->where("quantity", ">", 0)->get();
             foreach ($products as $product) {
                 $productDescription = $product->descriptions()->where('language_id', $language_id)->first();
                 if ($productDescription === null) {
@@ -358,6 +358,20 @@ class ProductController extends Controller
             $dto['products'] = $products;
             array_push($responseData, $dto);
         }
+        $noStockProducts = Product::where("quantity", "<=", 0)->get();
+        $noStockData["category_id"] = 999;
+        $noStockData["name"] = "售罄";
+        $noStockData["products"] = $noStockProducts;
+        foreach ($noStockProducts as $product) {
+            $productDescription = $product->descriptions()->where('language_id', $language_id)->first();
+            if ($productDescription === null) {
+                $productDescription = $product->descriptions()->first();
+            }
+            $product['name'] = $productDescription->name;
+            $product["options"] = array();
+        }
+        array_push($responseData, $noStockData);
+
         return $responseData;
     }
 
