@@ -28,6 +28,9 @@ Route::get('categories/{category_id}', 'CategoryController@show');
 Route::post('categories', 'CategoryController@create');
 Route::put('categories/{category_id}', 'CategoryController@update');
 
+Route::get('options', 'OptionController@index');
+Route::post("options", "OptionController@create");
+
 Route::get('locations', 'LocationController@index');
 Route::get('locations/{location_id}', 'LocationController@show');
 Route::post('locations', 'LocationController@create');
@@ -59,4 +62,3 @@ Route::group(['middleware' => ['jwt.auth', 'api-header']], function () {
 Route::post('orders', 'OrderController@create');
 Route::get('allorders', 'OrderController@getAll');
 Route::get('orders/{order_id}', 'OrderController@show');
-Route::get('options', 'OptionController@index');
