@@ -312,7 +312,7 @@ class ProductController extends Controller
             }
             $dto['name'] = $categoryDescription->name;
 
-            $products = $category->products()->where("status", $status)->get();
+            $products = $category->products()->where("status", $status)->where("quantity",">",0)->get();
             foreach ($products as $product) {
                 $productDescription = $product->descriptions()->where('language_id', $language_id)->first();
                 if ($productDescription === null) {

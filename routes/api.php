@@ -13,9 +13,11 @@ use Illuminate\Http\Request;
 |
  */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::get("initial", "InitController@index");
 
 Route::get('product/{product_id}', 'ProductController@show');
 Route::get('products', 'ProductController@index');
@@ -52,11 +54,12 @@ Route::group(['middleware' => ['jwt.auth', 'api-header']], function () {
         $response = ['success' => true, 'data' => $users];
         return response()->json($response, 201);
     });
-
+    Route::get("user", function (Request $request) {
+        return response()->json($request->user(), 200);
+    });
     Route::get('orders', 'OrderController@index');
     Route::post('convert', 'OrderController@convertOrderToShoppingCartList');
     Route::delete('order/{order_id}', 'OrderController@remove');
-
 });
 
 Route::post('orders', 'OrderController@create');

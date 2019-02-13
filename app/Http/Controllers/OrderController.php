@@ -193,6 +193,13 @@ class OrderController extends Controller
                 'total' => $orderItem->total,
             ]);
 
+            // decrease product quantity
+            $product = Product::find($orderItem->product_id)->decrement("quantity", $orderItem->quantity);
+
+            if ($product->quantity < 0) {
+                return response()->json(["errors" => ["code" => 1, "message" => "quantity is over stock"]], 400);
+            }
+
             if (isset($orderItem->options)) {
                 $orderOptions = $this->createOrderOptions($orderItem->options, $order_id, $order_product->order_product_id);
                 $order_product['options'] = $orderOptions;
