@@ -46,6 +46,7 @@ class CategoryController extends Controller
             'chinese_name' => 'required',
             'english_name' => 'required',
         ]);
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
 
         $categoryDescriptions = CategoryDescription::where('name', $request->name)->get();
         if (count($categoryDescriptions) > 0) {
@@ -56,7 +57,9 @@ class CategoryController extends Controller
         $categoryDescription1 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->chinese_name, 'language_id' => 1]);
         $categoryDescription2 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->english_name, 'language_id' => 2]);
 
-        return response()->json(['category_id' => $category->category_id, 'cn' => $categoryDescription1, 'en' => $categoryDescription2], 201);
+        $response_array = self::getCategoryList($language_id);
+
+        return response()->json($response_array, 201);
 
     }
 
