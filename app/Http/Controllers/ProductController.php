@@ -23,10 +23,11 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $language_id = $request->input("language_id");
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
         $status = isset($request->product_status) ? $request->product_status : 0;
+        $search_string = isset($request->search_string) ? $request->search_string : "";
 
-        $responseData = self::getProductsList($language_id, $status);
+        $responseData = self::getProductsList($language_id, $status, $search_string);
 
         return response()->json($responseData, 200);
     }
@@ -107,6 +108,7 @@ class ProductController extends Controller
 
         $errors = $this->validateRequest($request);
         $request->product = json_decode(json_encode($request->product));
+        $search_string = isset($request->search_string) ? $request->search_string : "";
 
         if (!is_numeric($product_id) || !is_integer($product_id + 0)) {
             $errors['product_id'] = ['The product id field is required.'];
@@ -242,7 +244,7 @@ class ProductController extends Controller
         }
 
         $status = $status === 1 ? 0 : 1;
-        $response_array = self::getProductsList($language_id, $status);
+        $response_array = self::getProductsList($language_id, $status, $search_string);
 
         return response()->json($response_array, 200);
 
@@ -295,7 +297,7 @@ class ProductController extends Controller
      * @param integer $status
      * @return Array
      */
-    public function getProductsList($language_id, $status)
+    public function getProductsList($language_id, $status, $search_string)
     {
         $categories = Category::all();
 
@@ -319,6 +321,13 @@ class ProductController extends Controller
                     $productDescription = $product->descriptions()->first();
                 }
                 $product['name'] = $productDescription->name;
+
+                if ($search_string !== "" && !(strpos($product['name'], $search_string) !== false)) {
+                    $products = $products->filter(function ($item) use ($product) {
+                        return $item->product_id !== $product->product_id;
+                    })->values();
+                    continue;
+                }
 
                 $options = array();
                 $product_options = $product->options()->get();
@@ -355,6 +364,7 @@ class ProductController extends Controller
                 }
                 $product['options'] = $options;
             }
+
             $dto['products'] = $products;
             array_push($responseData, $dto);
         }
@@ -424,12 +434,13 @@ class ProductController extends Controller
     {
 
         $language_id = isset($request->language_id) ? $request->language_id : 2;
+        $search_string = isset($request->search_string) ? $request->search_string : "";
         $product = Product::find($product_id);
         $request->product = json_decode(json_encode($request->product));
         $product->status = $request->product->status;
         $product->save();
         $status = $request->product->status === 1 ? 0 : 1;
-        $response_array = self::getProductsList($language_id, $status);
+        $response_array = self::getProductsList($language_id, $status, $search_string);
         return response()->json($response_array, 200);
     }
 
