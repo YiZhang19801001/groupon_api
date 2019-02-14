@@ -72,7 +72,6 @@ class OrderController extends Controller
         // add details to each order
         foreach ($orders as $order) {
             $detailedOrder = self::makeOrder($order);
-
             array_push($responseOrders, $detailedOrder);
         }
 
