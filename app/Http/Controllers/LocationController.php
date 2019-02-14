@@ -119,6 +119,15 @@ class LocationController extends Controller
 
         $location->update($input);
 
-        return response()->json(compact('location'), 200);
+        $locations = Location::all();
+        foreach ($locations as $location) {
+            if ($location->open !== null) {
+                $location->open = json_decode($location->open);
+            } else {
+                $location->open = [];
+            }
+        }
+
+        return response()->json(compact('locations'), 200);
     }
 }
