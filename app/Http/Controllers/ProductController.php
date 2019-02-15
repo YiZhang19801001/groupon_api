@@ -88,10 +88,12 @@ class ProductController extends Controller
         }
 
         ProductToCategory::create(['product_id' => $product_id, "category_id" => $category_id]);
+        $search_string = isset($request->search_string) ? $request->search_string : "";
+        $status = isset($request->status) ? $request->status : 0;
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
 
-        $product = self::getSingleProduct($product_id);
-
-        return response()->json(compact("product"), 201);
+        $products = self::getProductsList($language_id, $status, $search_string);
+        return response()->json(compact("products"), 201);
     }
 
     /**
