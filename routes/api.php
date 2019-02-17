@@ -66,5 +66,6 @@ Route::delete('order/{order_id}', 'OrderController@remove');
 Route::post('orders', 'OrderController@create');
 Route::get('allorders', 'OrderController@getAll');
 Route::get('orders/{order_id}', 'OrderController@show');
+Route::put("orders/{order_id}", "OrderController@update");
 
 Route::post('layout', "LayoutTextController@create");

@@ -20,7 +20,7 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
     /**
-     * Undocumented function
+     * show single order details
      *
      * @param Request $request
      * @return void
@@ -36,6 +36,19 @@ class OrderController extends Controller
 
         return response()->json(compact('order'), 200);
     }
+    /**
+     * update order details
+     * @param Request
+     * @param Integer $order_id
+     * @return ResponseJson with orders and order
+     */
+    public function update(Request $request, $order_id)
+    {
+        $orders = array();
+        $order = array();
+        return response()->json(compact("orders", "order"), 200);
+    }
+
     /**
      * fetch all orders for cPanel use
      * @param Request $request
