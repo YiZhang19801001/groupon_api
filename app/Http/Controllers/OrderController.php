@@ -27,7 +27,6 @@ class OrderController extends Controller
      */
     public function show($order_id)
     {
-
         $dbOrder = Order::find($order_id);
         if ($dbOrder === null) {
             return response()->json(['errors' => "can not found order"], 400);
@@ -44,8 +43,13 @@ class OrderController extends Controller
      */
     public function update(Request $request, $order_id)
     {
-        $orders = array();
-        $order = array();
+        $orders = self::makeOrders($request);
+        $dbOrder = Order::find($order_id);
+        if ($dbOrder === null) {
+            return response()->json(['errors' => "can not found order"], 400);
+        }
+        $order = self::makeOrder($dbOrder);
+
         return response()->json(compact("orders", "order"), 200);
     }
 
@@ -55,6 +59,18 @@ class OrderController extends Controller
      * @return void
      */
     public function getAll(Request $request)
+    {
+        $orders = self::makeOrders($request);
+
+        return response()->json(compact("orders"), 200);
+    }
+    /**
+     * helper function to fetch all orders with neccessary details from DB
+     *
+     * @param Request
+     * @return void
+     */
+    public function makeOrders($request)
     {
         $orders = Order::all();
         foreach ($orders as $order) {
@@ -66,8 +82,7 @@ class OrderController extends Controller
 
             $order["store_name"] = $store->name;
         }
-
-        return response()->json(compact("orders"), 200);
+        return $orders;
     }
     /**
      * show all orders for current user
@@ -401,6 +416,28 @@ class OrderController extends Controller
         OrderProduct::where('order_id', $order_id)->delete();
         OrderOption::where('order_id', $order_id)->delete();
 
+    }
+    /**
+     * update order status
+     * @param Request
+     * @return ResponseJson
+     */
+    public function updateStatus(Request $request, $order_id)
+    {
+        $newOrder = Order::find($order_id);
+
+        $newOrder->order_status_id = $request->order_status_id;
+
+        $newOrder->save();
+
+        $orders = self::makeOrders($request);
+        $dbOrder = Order::find($order_id);
+        if ($dbOrder === null) {
+            return response()->json(['errors' => "can not found order"], 400);
+        }
+        $order = self::makeOrder($dbOrder);
+
+        return response()->json(compact("order", "orders"), 200);
     }
 
 }

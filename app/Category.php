@@ -24,7 +24,7 @@ class Category extends Model
     ];
 
     protected $hidden = [
-        'image',
+
         'parent_id',
         'top',
         'column',

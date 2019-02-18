@@ -110,6 +110,7 @@ class CategoryController extends Controller
             $item['name'] = $description->name;
             $item['other_name'] = $description2->name;
             $item["number_of_products"] = $count;
+            $item["image"] = $category->image;
 
             array_push($response_array, $item);
         }
