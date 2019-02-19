@@ -366,8 +366,8 @@ class ProductController extends Controller
             array_push($responseData, $dto);
         }
         $noStockProducts = Product::where("quantity", "<=", 0)->get();
-        $noStockData["category_id"] = 999;
-        $noStockData["name"] = "售罄";
+        $noStockData["category_id"] = 9999999;
+        $noStockData["name"] = $language_id == 1 ? "Sold Out" : "售罄";
         $noStockData["products"] = $noStockProducts;
         foreach ($noStockProducts as $product) {
             $productDescription = $product->descriptions()->where('language_id', $language_id)->first();

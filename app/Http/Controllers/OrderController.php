@@ -223,7 +223,7 @@ class OrderController extends Controller
             // decrease product quantity
             $product = Product::find($orderItem->product_id)->decrement("quantity", $orderItem->quantity);
 
-            if ($product->quantity < 0) {
+            if (isset($product) || $product->quantity < 0) {
                 return response()->json(["errors" => ["code" => 1, "message" => "quantity is over stock"]], 400);
             }
 

@@ -65,7 +65,7 @@ class CategoryController extends Controller
         if ($request->get("file")) {
             $image = $request->get("file");
             $name = "$category->category_id.jpeg";
-            \Image::make($request->get('file'))->save(public_path('images/categories') . $name);
+            \Image::make($request->get('file'))->save(public_path('images/categories/') . $name);
         }
 
         $category->image = "/images/categories/$name";
