@@ -29,6 +29,7 @@ Route::get('categories', 'CategoryController@index');
 Route::get('categories/{category_id}', 'CategoryController@show');
 Route::post('categories', 'CategoryController@create');
 Route::put('categories/{category_id}', 'CategoryController@update');
+Route::delete("categories/{category_id}", "CategoryController@delete");
 
 Route::get('options', 'OptionController@index');
 Route::post("options", "OptionController@create");

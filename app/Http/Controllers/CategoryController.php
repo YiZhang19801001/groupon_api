@@ -40,12 +40,20 @@ class CategoryController extends Controller
 
         return response()->json(['category' => ['category_id' => $category->category_id, 'name' => $description->name]], 200);
     }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function create(Request $request)
     {
         $validatedData = $request->validate([
             'chinese_name' => 'required',
             'english_name' => 'required',
         ]);
+
         $language_id = isset($request->language_id) ? $request->language_id : 2;
 
         $categoryDescriptions = CategoryDescription::where('name', $request->name)->get();
@@ -54,8 +62,17 @@ class CategoryController extends Controller
         }
 
         $category = Category::create();
-        $categoryDescription1 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->chinese_name, 'language_id' => 1]);
-        $categoryDescription2 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->english_name, 'language_id' => 2]);
+        if ($request->get("file")) {
+            $image = $request->get("file");
+            $name = "$category->category_id.jpeg";
+            \Image::make($request->get('file'))->save(public_path('images/categories') . $name);
+        }
+
+        $category->image = "/images/categories/$name";
+        $category->save();
+
+        $categoryDescription1 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->chinese_name, 'language_id' => 2]);
+        $categoryDescription2 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->english_name, 'language_id' => 1]);
 
         $response_array = self::getCategoryList($language_id);
 
@@ -117,6 +134,18 @@ class CategoryController extends Controller
 
         return $response_array;
 
+    }
+
+    public function delete(Request $request, $category_id)
+    {
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
+        Category::destroy($category_id);
+
+        CategoryDescription::where("category_id", $category_id)->delete();
+
+        $categories = self::getCategoryList($language_id);
+
+        return response()->json($categories, 200);
     }
 
 }
