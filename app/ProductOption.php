@@ -11,7 +11,7 @@ class ProductOption extends Model
     public $timestamps = false;
 
     protected $fillable = ['product_id', 'option_id', 'value', 'required'];
-    protected $hidden = ['product_id', 'option_id'];
+    protected $hidden = ['product_id'];
 
     public function option()
     {
@@ -26,4 +26,5 @@ class ProductOption extends Model
     {
         return $this->hasMany('App\ProductOptionValue', 'product_option_id', 'product_option_id');
     }
+
 }

@@ -252,15 +252,16 @@ class ProductController extends Controller
      * @param Integer Product_id
      * @return Response product with details
      */
-    public function show($product_id)
+    public function show(Request $request, $product_id)
     {
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
 
-        $responseData = self::getSingleProduct($product_id);
+        $responseData = self::getSingleProduct($language_id, $product_id);
         //3. return response
         return response()->json($responseData, 200);
     }
 
-    public function getSingleProduct($product_id)
+    public function getSingleProduct($language_id, $product_id)
     {
         $responseData = array();
 //1. fetch product
@@ -274,17 +275,28 @@ class ProductController extends Controller
 //2.3 options
         $responseData['options'] = $product->options()->get();
         foreach ($responseData['options'] as $value) {
-            $value['descriptions'] = $value->optionDescriptions()->get();
-        }
+            $valueDescription = $value->optionDescriptions()->where("language_id", $language_id)->first();
+            if ($valueDescription === null) {
+                $valueDescription = $value->optionDescriptions()->first();
+            }
+            //2.3.1 option name
 
-//2.4 option values
-        $responseData['optionValues'] = $product->optionValues()->get();
-        foreach ($responseData['optionValues'] as $value) {
-            $value['descriptions'] = $value->descriptions()->get();
+            $value["name"] = $valueDescription->name;
+            //2.3.2 option values
+            $productOptionValues = $value->optionValues()->get();
+            foreach ($productOptionValues as $productOptionValue) {
+                $productOptionValueDescription = $value->optionDescriptions()->where("language_id", $language_id)->first();
+                if ($productOptionValueDescription === null) {
+                    $productOptionValueDescription = $value->optionDescriptions()->first();
+                }
+
+                $productOptionValue["option_value_name"] = $productOptionValueDescription->name;
+
+            }
+            $value["values"] = $productOptionValues;
         }
 
         return $responseData;
-
     }
 
     /**

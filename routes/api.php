@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 
 Route::get("initial", "InitController@index");
 
-Route::get('product/{product_id}', 'ProductController@show');
+Route::get('products/{product_id}', 'ProductController@show');
 Route::get('products', 'ProductController@index');
 Route::post('products', 'ProductController@create');
 Route::put('products/{product_id}', 'ProductController@update');
