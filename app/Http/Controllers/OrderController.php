@@ -72,7 +72,7 @@ class OrderController extends Controller
      */
     public function makeOrders($request)
     {
-        $orders = Order::all();
+        $orders = Order::paginate(2);
         foreach ($orders as $order) {
             $order["status_name"] = $order->status()->first()->name;
             $user = User::find($order->customer_id);

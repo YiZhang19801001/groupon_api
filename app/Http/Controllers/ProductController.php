@@ -188,6 +188,8 @@ class ProductController extends Controller
                 }
             }
         }
+
+        // How To:: use whereIn and whereNotIn
         // 5. delete options - remove product option which product_option_id not contains in $new_product_opiton_ids
         ProductOption::where("product_id", $product_id)->whereNotIn("product_option_id", $new_product_option_ids)->delete();
 
