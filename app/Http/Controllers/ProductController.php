@@ -143,104 +143,56 @@ class ProductController extends Controller
             $en_des->save();
         }
 
-//         //4. create options for product
-        //         $options = array();
-        //         foreach ($request->options as $option) {
-        //             $option = json_decode(json_encode($option));
-        //             $option_array = array();
-        //             //4.1 create oc_option if no exsiting option
-        //             if ($option->option_id === 'new') {
-        //                 $newOption = Option::create(['type' => $option->type, 'sort_order' => 1]);
-        //                 $option->option_id = $newOption->option_id;
-        //             }
-        //             $option_array['option_id'] = $option->option_id;
-        //             $option_array['type'] = $option->type;
-        //             //4.2 create oc_option_description
-        //             $optionDescriptions = array();
-        //             foreach ($option->descriptions as $optionDescription) {
-        //                 $optionDescription = json_decode(json_encode($optionDescription));
-        //                 $newOptionDescription = OptionDescription::where('option_id', $option->option_id)->where('language_id', $optionDescription->language_id)->first();
-        //                 if ($newOptionDescription !== null) {
+        //4. update options for product
+        $options = array();
+        $new_product_option_ids = array();
+        foreach ($request->options as $option) {
+            $option = json_decode(json_encode($option));
+            $option_array = array();
+            // 4.1 check if update option or add option
+            if (isset($option->product_option_id)) // update
+            {
+                array_push($new_product_option_ids, $option->product_option_id);
+                $product_option = ProductOption::find($option->product_option_id);
+                $product_option->optionValues()->delete();
+                foreach ($option->values as $optionValue) {
+                    $optionValue = json_decode(json_encode($optionValue));
+                    ProductOptionValue::create([
+                        'product_option_id' => $option->product_option_id,
+                        'product_id' => $product_id,
+                        'option_id' => $option->option_id,
+                        'option_value_id' => $optionValue->option_value_id,
+                        'quantity' => 999,
+                        'price' => 0.00,
+                    ]);
+                }
+            } else // add
+            {
+                $product_option = ProductOption::create([
+                    'product_id' => $product_id,
+                    'option_id' => $option->option_id,
+                    'value' => "",
+                    'required' => 1,
+                ]);
+                array_push($new_product_option_ids, $product_option->product_option_id);
+                foreach ($option->values as $optionValue) {
+                    $optionValue = json_decode(json_encode($optionValue));
+                    ProductOptionValue::create([
+                        'product_option_id' => $product_option->product_option_id,
+                        'product_id' => $product_id,
+                        'option_id' => $option->option_id,
+                        'option_value_id' => $optionValue->option_value_id,
+                        'quantity' => 999,
+                        'price' => 0.00,
+                    ]);
+                }
+            }
+        }
+        // 5. delete options - remove product option which product_option_id not contains in $new_product_opiton_ids
+        ProductOption::where("product_id", $product_id)->whereNotIn("product_option_id", $new_product_option_ids)->delete();
 
-//                     $newOptionDescription->update([
-        //                         'option_id' => $option->option_id,
-        //                         'language_id' => $optionDescription->language_id,
-        //                         'name' => $optionDescription->name,
-        //                     ]);
-        //                 } else {
-        //                     $newOptionDescription = OptionDescription::create(['option_id' => $option->option_id, 'language_id' => $optionDescription->language_id, 'name' => $optionDescription->name]);
-
-//                 }
-        //                 array_push($optionDescriptions, ['name' => $newOptionDescription->name, 'language_id' => $newOptionDescription->language_id]);
-        //             }
-        //             $option_array['descriptions'] = $optionDescriptions;
-        // //safe
-        //             //4.3 create oc_product_option
-        //             $productOption = ProductOption::find($option->product_option_id);
-        //             if ($productOption !== null) {
-        //                 $productOption->option_id = $option->option_id;
-        //                 $productOption->value = isset($option->value) ? $option->value : '';
-        //                 $productOption->required = $option->required;
-        //                 $productOption->save();
-
-//             } else {
-        //                 $productOption = ProductOption::create(['product_id' => $product->product_id, 'option_id' => $option->option_id, 'value' => isset($option->value) ? $option->value : '', 'required' => $option->required]);
-
-//             }
-        //             $option_array['required'] = $productOption->required;
-        //             $option_array['value'] = $productOption->value;
-
-//             $optionValues = array();
-        //             // create option_values
-        //             foreach ($option->values as $value) {
-        //                 $value = json_decode(json_encode($value));
-        //                 //4.4 create oc_option_value
-        //                 if ($value->option_value_id === 'new') {
-        //                     $newOptionValue = OptionValue::create(['option_id' => $option->option_id]);
-        //                     $value->option_value_id = $newOptionValue->option_value_id;
-        //                 }
-        //                 //4.5 create oc_option_value_description
-        //                 $optionValueDescriptions = array();
-        //                 foreach ($value->descriptions as $optionValueDescription) {
-        //                     $optionValueDescription = json_decode(json_encode($optionValueDescription));
-        //                     $newOptionValueDescription = OptionValueDescription::where('option_value_id', $value->option_value_id)->where('language_id', $optionValueDescription->language_id)->first();
-        //                     if ($newOptionValueDescription !== null) {
-        //                         $newOptionValueDescription->name = $optionValueDescription->name;
-        //                         $newOptionValueDescription->save();
-        //                     } else {
-
-//                         $newOptionValueDescription = OptionValueDescription::create(['option_value_id' => $value->option_value_id, 'language_id' => $optionValueDescription->language_id, 'option_id' => $option->option_id, 'name' => $optionValueDescription->name]);
-        //                     }
-
-//                     array_push($optionValueDescriptions, ['name' => $newOptionValueDescription->name, 'language_id' => $newOptionValueDescription->language_id]);
-        //                 }
-
-//                 //4.6 create oc_product_option_value
-        //                 $productOptionValue = ProductOptionValue::find($value->product_option_value_id);
-        //                 if ($productOptionValue !== null) {
-        //                     $productOptionValue->product_option_id = $productOption->product_option_id;
-        //                     $productOptionValue->product_id = $product->product_id;
-        //                     $productOptionValue->option_id = $option->option_id;
-        //                     $productOptionValue->option_value_id = $value->option_value_id;
-        //                     if (isset($value->quantity)) {
-        //                         $productOptionValue->quantity = $value->quantity;
-        //                     }
-        //                     $productOptionValue->price = $value->price;
-
-//                     $productOptionValue->save();
-        //                 } else {
-        //                     $productOptionValue = ProductOptionValue::create(['product_option_id' => $productOption->product_option_id, 'product_id' => $product->product_id, 'option_id' => $option->option_id, 'option_value_id' => $value->option_value_id, 'quantity' => isset($value->quantity) ? $value->quantity : 999, 'price' => $value->price]);
-
-//                 }
-        //                 array_push($optionValues, ['option_value_id' => $productOptionValue->option_value_id, 'price' => number_format($productOptionValue->price, 2), 'quantity' => $productOptionValue->quantity, 'descriptions' => $optionValueDescriptions]);
-        //             }
-
-//             $option_array['values'] = $optionValues;
-
-//             array_push($options, $option_array);
-        //         }
-
-        $status = $status === 1 ? 0 : 1;
+        $status = isset($request->status) ? $request->status : 0;
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
         $response_array = self::getProductsList($language_id, $status, $search_string);
 
         return response()->json($response_array, 200);
@@ -271,7 +223,14 @@ class ProductController extends Controller
         //2.1 descriptions
         $responseData['descriptions'] = $product->descriptions()->get();
 //2.2 category
-        $responseData['category_id'] = ProductToCategory::where('product_id', $product_id)->first()->category_id;
+
+        $category = Category::find(ProductToCategory::where("product_id", $product_id)->first()->category_id);
+        $categoryDescription = $category->descriptions()->where("language_id", $language_id)->first();
+        if ($categoryDescription === null) {
+            $categoryDescription = $category->descriptions()->first();
+        }
+        $category["name"] = $categoryDescription->name;
+        $responseData['category'] = $category;
 //2.3 options
         $responseData['options'] = $product->options()->get();
         foreach ($responseData['options'] as $value) {
@@ -281,7 +240,7 @@ class ProductController extends Controller
             }
             //2.3.1 option name
 
-            $value["name"] = $valueDescription->name;
+            $value["option_name"] = $valueDescription->name;
             //2.3.2 option values
             $productOptionValues = $value->optionValues()->get();
             foreach ($productOptionValues as $productOptionValue) {
@@ -454,23 +413,3 @@ class ProductController extends Controller
     }
 
 }
-
-/**
- *
- */
-
-//4.1 create oc_option if no exsiting option
-// Todo::
-// if ($option->option_id === 'new') {
-//     $newOption = Option::create(['type' => $option->type, 'sort_order' => 1]);
-//     $option->option_id = $newOption->option_id;
-// }
-//4.2 create oc_option_description
-// $optionDescriptions = array();
-// foreach ($option->descriptions as $optionDescription) {
-//     $optionDescription = json_decode(json_encode($optionDescription));
-
-//     $newOptionDescription = OptionDescription::create(['option_id' => $option->option_id, 'language_id' => $optionDescription->language_id, 'name' => $optionDescription->name]);
-//     array_push($optionDescriptions, ['name' => $newOptionDescription->name, 'language_id' => $newOptionDescription->language_id]);
-// }
-// $option_array['descriptions'] = $optionDescriptions;

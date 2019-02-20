@@ -24,7 +24,7 @@ class ProductOptionValue extends Model
 
         'product_id',
         'option_id',
-        'option_value_id',
+
         'subtract',
         'price_prefix',
         'points',
