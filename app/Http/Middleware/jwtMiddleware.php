@@ -17,7 +17,7 @@ class jwtMiddleware
     public function handle($request, Closure $next)
     {
         try {
-            $user = JWTAuth::toUser($request->input('token'));
+            $user = JWTAuth::toUser($request->input('api-token'));
             return $next($request);
 
         } catch (Exception $e) {
