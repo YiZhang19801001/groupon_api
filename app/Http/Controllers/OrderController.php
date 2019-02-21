@@ -407,7 +407,7 @@ class OrderController extends Controller
             array_push($shoppingCartList, $newOrderItem);
         }
 
-        $this->deleteOrder($request->order_id);
+
 
         return response()->json(compact("shoppingCartList"), 200);
     }
