@@ -29,16 +29,17 @@ class CategoryController extends Controller
      * @param Integer $category_id
      * @return Response select category with name
      */
-    public function show($language_id, $category_id)
+    public function show(Request $request, $category_id)
     {
+
+        $language_id = isset($request->language_id) ? $request->language_id : 2;
+
         $category = Category::find($category_id);
-        $description = $category->descriptions()->where('language_id', $language_id)->first();
-        if ($description === null) {
-            $description = $category->descriptions()->first();
-
-        }
-
-        return response()->json(['category' => ['category_id' => $category->category_id, 'name' => $description->name]], 200);
+        $description = $category->descriptions()->where('language_id', 2)->first();
+        $category["name"] = $description->name;
+        $description = $category->descriptions()->where('language_id', 1)->first();
+        $category["other_name"] = $description->name;
+        return response()->json($category, 200);
     }
 
     /**
