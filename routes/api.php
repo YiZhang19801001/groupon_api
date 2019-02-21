@@ -47,7 +47,7 @@ Route::get('reports', 'ReportsController@summary');
 Route::post('user/login', 'UserController@login');
 Route::post('user/register', 'UserController@register');
 
-Route::group(['middleware' => ['jwt.auth', 'api-header']], function () {
+Route::group(['middleware' => ['jwt.auth']], function () {
 // all routes to protected resources are registered here
     Route::get('users/list', function () {
         $users = App\User::all();
@@ -59,12 +59,12 @@ Route::group(['middleware' => ['jwt.auth', 'api-header']], function () {
     });
 
     Route::get('orders', 'OrderController@index');
+    Route::post('orders', 'OrderController@create');
+    Route::delete('order/{order_id}', 'OrderController@remove');
 });
 
 Route::post('convert', 'OrderController@convertOrderToShoppingCartList');
-Route::delete('order/{order_id}', 'OrderController@remove');
 
-Route::post('orders', 'OrderController@create');
 Route::get('allorders', 'OrderController@getAll');
 Route::get('orders/{order_id}', 'OrderController@show');
 Route::put("orders/{order_id}", "OrderController@update");

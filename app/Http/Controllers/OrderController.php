@@ -72,7 +72,7 @@ class OrderController extends Controller
      */
     public function makeOrders($request)
     {
-        $orders = Order::paginate(2);
+        $orders = Order::paginate(3);
         foreach ($orders as $order) {
             $order["status_name"] = $order->status()->first()->name;
             $user = User::find($order->customer_id);
@@ -198,8 +198,22 @@ class OrderController extends Controller
         $order = Order::create($input);
 
         $order_products = $this->createOrderProducts($request, $order->order_id);
+
+        // make reponse body
+        // get logged in user
+        $user = $request->user();
+        // response order with details container
+        $responseOrders = array();
+        // Todo:: paginate
+        $orders = Order::where('customer_id', $user->user_id)->get();
+        // add details to each order
+        foreach ($orders as $order) {
+            $detailedOrder = self::makeOrder($order);
+            array_push($responseOrders, $detailedOrder);
+        }
+
         //3. return response
-        return response()->json(['order' => $order, 'order_products' => $order_products], 201);
+        return response()->json($responseOrders, 201);
     }
 
     /**
@@ -221,9 +235,9 @@ class OrderController extends Controller
             ]);
 
             // decrease product quantity
-            $product = Product::find($orderItem->product_id)->decrement("quantity", $orderItem->quantity);
-
-            if (isset($product) || $product->quantity < 0) {
+            $product = Product::find($orderItem->product_id);
+            $product->decrement("quantity", $orderItem->quantity);
+            if (!isset($product) || $product->quantity < 0) {
                 return response()->json(["errors" => ["code" => 1, "message" => "quantity is over stock"]], 400);
             }
 
@@ -398,10 +412,27 @@ class OrderController extends Controller
         return response()->json(compact("shoppingCartList"), 200);
     }
 
-    public function remove($order_id)
+    public function remove(Request $request, $order_id)
     {
-        self::deleteOrder($order_id);
-        return response()->json(["message" => "order deleted"], 204);
+        Order::destroy($order_id);
+        OrderProduct::where('order_id', $order_id)->delete();
+        OrderOption::where('order_id', $order_id)->delete();
+
+// make reponse body
+        // get logged in user
+        $user = $request->user();
+// response order with details container
+        $responseOrders = array();
+// Todo:: paginate
+        $orders = Order::where('customer_id', $user->user_id)->get();
+// add details to each order
+        foreach ($orders as $order) {
+            $detailedOrder = self::makeOrder($order);
+            array_push($responseOrders, $detailedOrder);
+        }
+
+// return response
+        return response()->json($responseOrders, 200);
 
     }
 
@@ -415,7 +446,6 @@ class OrderController extends Controller
         Order::destroy($order_id);
         OrderProduct::where('order_id', $order_id)->delete();
         OrderOption::where('order_id', $order_id)->delete();
-
     }
     /**
      * update order status
