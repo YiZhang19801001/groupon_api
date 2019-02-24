@@ -6,15 +6,20 @@ use App\Location;
 use App\Order;
 use App\OrderProduct;
 use App\Product;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 
 class ReportsController extends Controller
 {
     public function summary(Request $request)
     {
+        $today = new DateTime("now", new DateTimeZone('Australia/Sydney'));
+        $date_today = $today->format('y-m-d');
+
         $language_id = isset($request->language_id) ? $request->language_id : 2;
-        $date_start = $request->input("date_start");
-        $date_end = $request->input("date_end");
+        $date_start = isset($request->dateStart) ? $request->dateStart : $today;
+        $date_end = isset($request->dateEnd) ? $request->dateEnd : $today;
 
         $summary = array();
 
