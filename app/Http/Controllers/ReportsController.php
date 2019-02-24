@@ -15,15 +15,15 @@ class ReportsController extends Controller
     public function summary(Request $request)
     {
         $today = new DateTime("now", new DateTimeZone('Australia/Sydney'));
-        $date_today = $today->format('y-m-d');
+        $date_today = $today->format('Y-m-d');
 
         $language_id = isset($request->language_id) ? $request->language_id : 2;
-        $date_start = isset($request->dateStart) ? $request->dateStart : $today;
-        $date_end = isset($request->dateEnd) ? $request->dateEnd : $today;
+        $date_start = isset($request->startDate) ? $request->startDate : $today;
+        $date_end = isset($request->endDate) ? $request->endDate : $today;
 
         $summary = array();
 
-        $orders = Order::all();
+        $orders = Order::where("date_added", ">=", $date_start)->where("date_added", "<=", $date_end)->get();
 
         // 1. caculate sales
         $sum = 0;
