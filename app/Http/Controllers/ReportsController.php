@@ -62,8 +62,8 @@ class ReportsController extends Controller
         $date_end = isset($request->endDate) ? $request->endDate : $today;
 
         // fetch data from DB
-        // $orders = Order::where("date_added", ">=", $date_start)->where("date_added", "<=", $date_end)->get();
-        $orders = Order::all();
+        $orders = Order::where("date_added", ">=", $date_start)->where("date_added", "<=", $date_end)->get();
+
         // create response body
         $report = array();
 
