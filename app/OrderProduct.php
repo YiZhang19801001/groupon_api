@@ -36,4 +36,8 @@ class OrderProduct extends Model
         return number_format($value, 2);
 
     }
+    public function category()
+    {
+        return $this->hasOne("App\ProductToCategory", "product_id", "product_id");
+    }
 }

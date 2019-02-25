@@ -40,7 +40,7 @@ Route::post('locations', 'LocationController@create');
 Route::put('locations/{location_id}', 'LocationController@update');
 
 Route::get('reports', 'ReportsController@summary');
-
+Route::get('report', 'ReportsController@show');
 // The registration and login requests doesn't come with tokens
 // as users at that point have not been authenticated yet
 // Therefore the jwtMiddleware will be exclusive of them
