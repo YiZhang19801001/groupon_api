@@ -28,13 +28,9 @@ class ReportsControllerHelper
 
         $summary["sales"] = $sum;
         $summary["sales_by_store"] = self::makeSalesByStore($orders);
-
         $summary["sales_by_date"] = self::makeSalesByDate($orders);
-
         $summary["sales_by_payment"] = self::makeSalesByPayment($orders);
-
         $summary["sales_by_product"] = self::makeSalesByProduct($orders, $language_id);
-
         $summary["sales_by_customer"] = self::makeSalesByCustomer($orders);
 
         return $summary;
