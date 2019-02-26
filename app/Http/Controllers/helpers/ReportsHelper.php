@@ -6,6 +6,7 @@ use App\Category;
 use App\Location;
 use App\OrderProduct;
 use App\Product;
+use App\User;
 
 class ReportsHelper
 {
@@ -145,10 +146,11 @@ class ReportsHelper
         $orders_by_customer = $orders->groupby("customer_id");
         foreach ($orders_by_customer as $orderArray) {
             $total = 0;
+            $username = User::find($orderArray[0]->customer_id)->username;
             foreach ($orderArray as $order) {
                 $total += $order->total;
             }
-            array_push($sum_by_customer, ["customer_id" => $orderArray[0]->customer_id, "total" => $total, "quantity" => count($orderArray)]);
+            array_push($sum_by_customer, ["customer_id" => $orderArray[0]->customer_id, "username" => $username, "total" => $total, "quantity" => count($orderArray)]);
         }
         return $sum_by_customer;
     }
