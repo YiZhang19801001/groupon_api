@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\helpers\OrderHelper;
 use App\Location;
 use App\Option;
 use App\Order;
@@ -19,6 +20,15 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    /**
+     * constructor funtion
+     * @return Void create an instance of helper class - ReportsControllerHelper
+     */
+    public function __construct()
+    {
+        $this->helper = new OrderHelper();
+    }
+
     /**
      * show single order details
      *
@@ -60,7 +70,18 @@ class OrderController extends Controller
      */
     public function getAll(Request $request)
     {
-        $orders = self::makeOrders($request);
+        $method = isset($request->method) ? $request->method : "all";
+        switch ($method) {
+            case 'all':
+                $orders = self::makeOrders();
+                break;
+            case 'byStore':
+                $orders = $this->helper->makeOrdersByStore();
+            default:
+                $orders = self::makeOrders();
+
+                break;
+        }
 
         return response()->json(compact("orders"), 200);
     }
@@ -70,7 +91,7 @@ class OrderController extends Controller
      * @param Request
      * @return void
      */
-    public function makeOrders($request)
+    public function makeOrders()
     {
         $orders = Order::paginate(3);
         foreach ($orders as $order) {
@@ -406,8 +427,6 @@ class OrderController extends Controller
 
             array_push($shoppingCartList, $newOrderItem);
         }
-
-
 
         return response()->json(compact("shoppingCartList"), 200);
     }
