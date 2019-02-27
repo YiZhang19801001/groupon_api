@@ -77,9 +77,9 @@ class OrderController extends Controller
                 break;
             case 'byStore':
                 $orders = $this->helper->makeOrdersByStore();
+                break;
             default:
                 $orders = self::makeOrders();
-
                 break;
         }
 
@@ -117,7 +117,7 @@ class OrderController extends Controller
         // response order with details container
         $responseOrders = array();
         // Todo:: paginate
-        $orders = Order::where('customer_id', $user->user_id)->get();
+        $orders = Order::where('customer_id', $user->user_id)->orderByDesc("date_added")->get();
         // add details to each order
         foreach ($orders as $order) {
             $detailedOrder = self::makeOrder($order);
