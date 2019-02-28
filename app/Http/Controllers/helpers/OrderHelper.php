@@ -53,10 +53,13 @@ class OrderHelper
     {
         $language_id = 2;
         $orderProducts = OrderProduct::where('order_id', $order_id)->get();
-
+        if (count($orderProducts) < 1) {
+            return $orderProducts;
+        }
         foreach ($orderProducts as $orderProduct) {
             $options = array();
             $options = OrderOption::where('order_product_id', $orderProduct->order_product_id)->get();
+
             foreach ($options as $orderOption) {
                 $product_option = ProductOption::find($orderOption["product_option_id"]);
                 $product_option_value = ProductOptionValue::find($orderOption["product_option_value_id"]);
@@ -65,13 +68,15 @@ class OrderHelper
                 if ($product_option_description === null) {
                     $product_option_description = $product_option->optionDescriptions()->first();
                 }
-                $product_option_value_description = $product_option_value->descriptions()->where('language_id', $language_id)->first();
-                if ($product_option_value_description === null) {
-                    $product_option_value_description = $product_option_value->descriptions()->first();
+                if ($product_option_value) {
+                    $product_option_value_description = $product_option_value->descriptions()->where('language_id', $language_id)->first();
+                    if ($product_option_value_description === null) {
+                        $product_option_value_description = $product_option_value->descriptions()->first();
+                    }
                 }
                 $orderOption["option_name"] = $product_option_description->name;
-                $orderOption["option_value_name"] = $product_option_value_description->name;
-                $orderOption["price"] = number_format($product_option_value->price, 2);
+                $orderOption["option_value_name"] = isset($product_option_value_description) ? $product_option_value_description->name : "";
+                $orderOption["price"] = isset($product_option_value) ? number_format($product_option_value->price, 2) : 0;
             }
             $product_description = ProductDescription::where('product_id', $orderProduct->product_id)->where('language_id', $language_id)->first();
             if ($product_description === null) {
