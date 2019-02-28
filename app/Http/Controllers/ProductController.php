@@ -36,23 +36,11 @@ class ProductController extends Controller
      */
     public function create(Request $request)
     {
-        //1. validation
-        // $validatedData = $request->validate([
-        //     'category_id' => 'required|integer',
-        // ]);
 
         $errors = array();
-        // $errors = $this->validateRequest($request);
+
         $status = 1;
         $product = json_decode(json_encode($request->product));
-
-        //1.1 validate product.sku duplication
-        // if (isset($request->product->sku)) {
-        //     $row = Product::where('sku', $request->product->sku)->get();
-        //     if (count($row) > 0) {
-        //         $errors['product.sku'] = ['The product sku is duplicate in database.'];
-        //     }
-        // }
 
         if (count($errors) > 0) {
             return response()->json(compact('errors'), 422);
@@ -64,6 +52,16 @@ class ProductController extends Controller
         $newProduct = Product::create(['price' => $product->price, 'quantity' => $product->quantity, "sort_order" => $product->sort_order, "stock_status_id" => $product->stock_status_id]);
 
         $product_id = $newProduct->product_id;
+
+        if ($request->get("file")) {
+            $image = $request->get("file");
+            $name = "$product_id.jpeg";
+            \Image::make($request->get('file'))->save(public_path('images/products/') . $name);
+            $newProduct->image = "/images/products/$name";
+        }
+
+        $newProduct->save();
+
         //3. create oc_product_description [multiple descriptions should be created, as user may entry all names for different languages]
 
         $descriptionCn = ProductDescription::create(['product_id' => $product_id, 'language_id' => 2, 'name' => $product->chinese_name]);
@@ -129,6 +127,15 @@ class ProductController extends Controller
         $product = Product::find($product_id);
         $product->price = $request->product->price;
         $product->quantity = $request->product->quantity;
+
+        //How To:: upload image React && Laravel
+        if ($request->get("file")) {
+            $image = $request->get("file");
+            $name = "$product_id.jpeg";
+            \Image::make($request->get('file'))->save(public_path('images/products/') . $name);
+            $product->image = "/images/products/$name";
+        }
+
         $product->save();
 
         //3. update oc_product_description [multiple descriptions should be created, as user may update all names for different languages]

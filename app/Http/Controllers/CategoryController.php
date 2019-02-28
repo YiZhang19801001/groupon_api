@@ -67,9 +67,9 @@ class CategoryController extends Controller
             $image = $request->get("file");
             $name = "$category->category_id.jpeg";
             \Image::make($request->get('file'))->save(public_path('images/categories/') . $name);
+            $category->image = "/images/categories/$name";
         }
 
-        $category->image = "/images/categories/$name";
         $category->save();
 
         $categoryDescription1 = CategoryDescription::create(['category_id' => $category->category_id, 'name' => $request->chinese_name, 'language_id' => 2]);
@@ -94,6 +94,15 @@ class CategoryController extends Controller
         if (!$category) {
             return response()->json(['errors' => ['Messages' => 'This category can not be found.']], 400);
         }
+
+        if ($request->get("file")) {
+            $image = $request->get("file");
+            $name = "$category->category_id.jpeg";
+            \Image::make($request->get('file'))->save(public_path('images/categories/') . $name);
+            $category->image = "/images/categories/$name";
+        }
+
+        $category->save();
 
         $categoryDescription1 = CategoryDescription::where("category_id", $category_id)->where("language_id", 1)->first();
         $categoryDescription1->name = $request->english_name;
