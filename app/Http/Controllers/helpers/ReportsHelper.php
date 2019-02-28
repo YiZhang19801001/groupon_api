@@ -34,6 +34,7 @@ class ReportsHelper
         $summary["sales_by_payment"] = self::makeSalesByPayment($orders);
         $summary["sales_by_product"] = self::makeSalesByProduct($orders, $language_id);
         $summary["sales_by_customer"] = self::makeSalesByCustomer($orders);
+        $summary["sales_by_category"] = self::categoryReport($orders, $language_id);
 
         return $summary;
     }
