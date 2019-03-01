@@ -71,3 +71,4 @@ Route::put("orders/{order_id}", "OrderController@update");
 Route::patch("orders/{order_id}", "OrderController@updateStatus");
 
 Route::post('layout', "LayoutTextController@create");
+Route::post("payment", "OrderController@paymentNotify");
