@@ -16,9 +16,22 @@ class OrderHelper
     /**
      * function - make orders group by store
      */
-    public function makeOrdersByStore()
+    public function makeOrdersByStore($search_string)
     {
         $orders = Order::all();
+        foreach ($orders as $order) {
+            if ($search_string !== "") {
+                if (
+                    !(strpos($order['lastname'], $search_string) !== false)
+                    && !(strpos($order['telephone'], $search_string) !== false)
+                    && !(strpos($order['invoice_no'], $search_string) !== false)
+                ) {
+                    $orders = $orders->filter(function ($item) use ($order) {
+                        return $item->order_id !== $order->order_id;
+                    })->values();
+                }
+            }
+        }
         foreach ($orders as $order) {
             $order["status_name"] = $order->status()->first()->name;
             $user = User::find($order->customer_id);

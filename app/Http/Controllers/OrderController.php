@@ -75,15 +75,16 @@ class OrderController extends Controller
     public function getAll(Request $request)
     {
         $method = isset($request->method) ? $request->method : "all";
+        $search_string = isset($request->search_string) ? $request->search_string : "";
         switch ($method) {
             case 'all':
-                $orders = self::makeOrders();
+                $orders = self::makeOrders($search_string);
                 break;
             case 'byStore':
-                $orders = $this->helper->makeOrdersByStore();
+                $orders = $this->helper->makeOrdersByStore($search_string);
                 break;
             default:
-                $orders = self::makeOrders();
+                $orders = self::makeOrders($search_string);
                 break;
         }
 
@@ -95,9 +96,22 @@ class OrderController extends Controller
      * @param Request
      * @return void
      */
-    public function makeOrders()
+    public function makeOrders($search_string)
     {
         $orders = Order::paginate(3);
+        foreach ($orders as $order) {
+            if ($search_string !== "") {
+                if (
+                    !(strpos($order['lastname'], $search_string) !== false)
+                    && !(strpos($order['telephone'], $search_string) !== false)
+                    && !(strpos($order['invoice_no'], $search_string) !== false)
+                ) {
+                    $orders = $orders->filter(function ($item) use ($order) {
+                        return $item->order_id !== $order->order_id;
+                    })->values();
+                }
+            }
+        }
         foreach ($orders as $order) {
             $order["status_name"] = $order->status()->first()->name;
             $user = User::find($order->customer_id);
