@@ -513,7 +513,8 @@ class OrderController extends Controller
 
         $newOrder->save();
 
-        $orders = self::makeOrders($request);
+        $search_string = isset($request->search_string) ? $request->search_string : "";
+        $orders = self::makeOrders($search_string);
         $dbOrder = Order::find($order_id);
         if ($dbOrder === null) {
             return response()->json(['errors' => "can not found order"], 400);
