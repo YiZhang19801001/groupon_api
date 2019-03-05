@@ -54,9 +54,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         $response = ['success' => true, 'data' => $users];
         return response()->json($response, 201);
     });
-    Route::get("user", function (Request $request) {
-        return response()->json($request->user(), 200);
-    });
+    Route::get("user", 'UserController@show');
 
     Route::get('orders', 'OrderController@index');
     Route::post('orders', 'OrderController@create');

@@ -36,7 +36,8 @@ class UserController extends Controller
             $token = self::getToken($request->email, $request->password);
             $user->api_token = $token;
             $user->save();
-            $response = ['success' => true, 'data' => ['id' => $user->user_id, 'api_token' => $user->api_token, 'name' => $user->username, 'email' => $user->email]];
+            $permissions = $user->permissions()->get();
+            $response = ['success' => true, 'data' => ['id' => $user->user_id, 'api_token' => $user->api_token, 'name' => $user->username, 'email' => $user->email, 'permissions' => $permissions]];
         } else {
             $response = ['success' => false, 'data' => 'Record doesnt exists'];
         }
@@ -73,5 +74,17 @@ class UserController extends Controller
         }
 
         return response()->json($response, 201);
+    }
+
+    public function show(Request $request)
+    {
+
+        $user = $request->user();
+
+        $permissions = $user->permissions()->get();
+        $response = ['success' => true, 'data' => ['id' => $user->user_id, 'api_token' => $user->api_token, 'name' => $user->username, 'email' => $user->email, 'permissions' => $permissions]];
+
+        return response()->json($response, 200);
+
     }
 }

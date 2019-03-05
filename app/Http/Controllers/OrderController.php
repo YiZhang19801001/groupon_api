@@ -231,7 +231,11 @@ class OrderController extends Controller
             'invoice_no' => $request->invoice_no, 'store_id' => $request->store_id, 'customer_id' => $request->customer_id, 'fax' => $request->fax, 'payment_method' => $request->payment_method, 'total' => $request->total, 'date_added' => $date_today, 'date_modified' => $date_today, 'order_status_id' => $request->order_status_id,
         ];
         $order = Order::create($input);
+        if (isset($request->customerComments)) {
+            $order->comment = $request->customerComments;
+            $order->save();
 
+        }
         $order_products = $this->createOrderProducts($request, $order->order_id);
 
         // make reponse body

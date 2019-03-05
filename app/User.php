@@ -43,4 +43,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    # permissions
+    public function permissions()
+    {
+        return $this->hasManyThrough('App\Permission', 'App\UserPermission', 'user_id', 'permission_id', 'user_id', 'permission_id');
+    }
 }
