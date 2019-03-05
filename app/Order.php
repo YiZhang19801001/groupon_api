@@ -105,7 +105,7 @@ class Order extends Model
         'shipping_custom_field',
         'shipping_method',
         'shipping_code',
-        'comment',
+
         'affiliate_id',
         'commission',
         'marketing_id',

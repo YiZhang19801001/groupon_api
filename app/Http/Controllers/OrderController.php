@@ -151,6 +151,7 @@ class OrderController extends Controller
         $detailedOrder["status_id"] = $order->order_status_id;
         $detailedOrder["status"] = OrderStatus::where('order_status_id', $order->order_status_id)->first()->name;
         $detailedOrder["order_items"] = self::fetchOrderProducts($order->order_id);
+        $detailedOrder["comments"] = $order->comment;
 
         return $detailedOrder;
     }
@@ -227,8 +228,10 @@ class OrderController extends Controller
         $today = new DateTime("now", new DateTimeZone('Australia/Sydney'));
         $date_today = $today->format('y-m-d');
 
+        $user = $request->user();
+
         $input = [
-            'invoice_no' => $request->invoice_no, 'store_id' => $request->store_id, 'customer_id' => $request->customer_id, 'fax' => $request->fax, 'payment_method' => $request->payment_method, 'total' => $request->total, 'date_added' => $date_today, 'date_modified' => $date_today, 'order_status_id' => $request->order_status_id,
+            'invoice_no' => $request->invoice_no, 'store_id' => $request->store_id, 'customer_id' => $user->user_id, 'fax' => $request->fax, 'payment_method' => $request->payment_method, 'total' => $request->total, 'date_added' => $date_today, 'date_modified' => $date_today, 'order_status_id' => $request->order_status_id,
         ];
         $order = Order::create($input);
         if (isset($request->customerComments)) {
@@ -239,8 +242,7 @@ class OrderController extends Controller
         $order_products = $this->createOrderProducts($request, $order->order_id);
 
         // make reponse body
-        // get logged in user
-        $user = $request->user();
+
         // response order with details container
         $responseOrders = array();
         // Todo:: paginate

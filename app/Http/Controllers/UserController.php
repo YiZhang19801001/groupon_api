@@ -82,7 +82,7 @@ class UserController extends Controller
         $user = $request->user();
 
         $permissions = $user->permissions()->get();
-        $response = ['success' => true, 'data' => ['id' => $user->user_id, 'api_token' => $user->api_token, 'name' => $user->username, 'email' => $user->email, 'permissions' => $permissions]];
+        $response = ['success' => true, 'data' => ['id' => $user->user_id, 'api_token' => $user->api_token, 'username' => $user->username, 'email' => $user->email, 'permissions' => $permissions]];
 
         return response()->json($response, 200);
 
