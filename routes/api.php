@@ -55,7 +55,6 @@ Route::group(['middleware' => ['jwt.auth']], function () {
         return response()->json($response, 201);
     });
     Route::get("user", 'UserController@show');
-
     Route::get('orders', 'OrderController@index');
     Route::post('orders', 'OrderController@create');
     Route::delete('order/{order_id}', 'OrderController@remove');

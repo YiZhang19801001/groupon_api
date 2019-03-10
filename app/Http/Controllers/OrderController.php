@@ -3,16 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\helpers\OrderHelper;
-use App\Location;
 use App\Option;
 use App\Order;
 use App\OrderOption;
 use App\OrderProduct;
-use App\OrderStatus;
 use App\Product;
-use App\ProductDescription;
-use App\ProductOption;
-use App\ProductOptionValue;
 use App\User;
 use DateTime;
 use DateTimeZone;
@@ -28,6 +23,7 @@ class OrderController extends Controller
     {
         $this->helper = new OrderHelper();
     }
+
     public function receiveNotify(Request $request)
     {
 
@@ -45,10 +41,11 @@ class OrderController extends Controller
         if ($dbOrder === null) {
             return response()->json(['errors' => "can not found order"], 400);
         }
-        $order = self::makeOrder($dbOrder);
+        $order = $this->helper->makeOrder($dbOrder);
 
         return response()->json(compact('order'), 200);
     }
+
     /**
      * update order details
      * @param Request
@@ -57,12 +54,12 @@ class OrderController extends Controller
      */
     public function update(Request $request, $order_id)
     {
-        $orders = self::makeOrders($request);
+        $orders = $this->helper->makeOrders($request);
         $dbOrder = Order::find($order_id);
         if ($dbOrder === null) {
             return response()->json(['errors' => "can not found order"], 400);
         }
-        $order = self::makeOrder($dbOrder);
+        $order = $this->helper->makeOrder($dbOrder);
 
         return response()->json(compact("orders", "order"), 200);
     }
@@ -78,51 +75,19 @@ class OrderController extends Controller
         $search_string = isset($request->search_string) ? $request->search_string : "";
         switch ($method) {
             case 'all':
-                $orders = self::makeOrders($search_string);
+                $orders = $this->helper->makeOrders($search_string);
                 break;
             case 'byStore':
                 $orders = $this->helper->makeOrdersByStore($search_string);
                 break;
             default:
-                $orders = self::makeOrders($search_string);
+                $orders = $this->helper->makeOrders($search_string);
                 break;
         }
 
         return response()->json(compact("orders"), 200);
     }
-    /**
-     * helper function to fetch all orders with neccessary details from DB
-     *
-     * @param Request
-     * @return void
-     */
-    public function makeOrders($search_string)
-    {
-        $orders = Order::paginate(3);
-        foreach ($orders as $order) {
-            if ($search_string !== "") {
-                if (
-                    !(strpos($order['lastname'], $search_string) !== false)
-                    && !(strpos($order['telephone'], $search_string) !== false)
-                    && !(strpos($order['invoice_no'], $search_string) !== false)
-                ) {
-                    $orders = $orders->filter(function ($item) use ($order) {
-                        return $item->order_id !== $order->order_id;
-                    })->values();
-                }
-            }
-        }
-        foreach ($orders as $order) {
-            $order["status_name"] = $order->status()->first()->name;
-            $user = User::find($order->customer_id);
-            $order["user"] = $user;
-            $store = Location::find($order->store_id);
-            $order["order_items"] = self::fetchOrderProducts($order->order_id);
 
-            $order["store_name"] = $store->name;
-        }
-        return $orders;
-    }
     /**
      * show all orders for current user
      * @param void
@@ -138,97 +103,13 @@ class OrderController extends Controller
         $orders = Order::where('customer_id', $user->user_id)->orderByDesc("date_added")->get();
         // add details to each order
         foreach ($orders as $order) {
-            $detailedOrder = self::makeOrder($order);
+            $detailedOrder = $this->helper->makeOrder($order);
             array_push($responseOrders, $detailedOrder);
         }
 
         return response()->json(['orders' => $responseOrders], 200);
     }
-    /**
-     * helper function to add order products to order
-     * @param Order
-     * @return Order order with details
-     */
-    public function makeOrder($order)
-    {
-        $detailedOrder = array();
 
-        $detailedOrder["invoice_no"] = $order->invoice_no;
-        $detailedOrder["order_id"] = $order->order_id;
-        $detailedOrder["store_id"] = $order->store_id;
-        $store = Location::find($order->store_id);
-        $detailedOrder["store_name"] = $store->name;
-        $detailedOrder["picked_date"] = $order->fax;
-        $detailedOrder["create_date"] = $order->date_added;
-        $detailedOrder["payment_method"] = $order->payment_method;
-        $detailedOrder["total"] = $order->total;
-        $detailedOrder["status_id"] = $order->order_status_id;
-        $detailedOrder["status"] = OrderStatus::where('order_status_id', $order->order_status_id)->first()->name;
-        $detailedOrder["order_items"] = self::fetchOrderProducts($order->order_id);
-        $detailedOrder["comments"] = $order->comment;
-
-        return $detailedOrder;
-    }
-    /**
-     * helper function to fetch order product for certain order
-     * @param Integer OrderId
-     * @return Array(OrderProduct)
-     */
-    public function fetchOrderProducts($order_id)
-    {
-        $language_id = 2;
-        $orderProducts = OrderProduct::where('order_id', $order_id)->get();
-
-        if (count($orderProducts) < 1) {
-            return $orderProducts;
-        }
-
-        foreach ($orderProducts as $orderProduct) {
-            $options = array();
-
-            $product_description = ProductDescription::where('product_id', $orderProduct->product_id)->where('language_id', $language_id)->first();
-            if ($product_description === null) {
-                $product_description = ProductDescription::where('product_id', $orderProduct->product_id)->first();
-            }
-
-            $options = OrderOption::where('order_product_id', $orderProduct->order_product_id)->get();
-            if (count($options) > 1) {
-                foreach ($options as $orderOption) {
-                    $product_option = ProductOption::find($orderOption["product_option_id"]);
-                    $product_option_value = ProductOptionValue::find($orderOption["product_option_value_id"]);
-
-                    $product_option_description = $product_option->optionDescriptions()->where('language_id', $language_id)->first();
-                    if ($product_option_description === null) {
-                        $product_option_description = $product_option->optionDescriptions()->first();
-                    }
-                    $product_option_value_description = $product_option_value->descriptions()->where('language_id', $language_id)->first();
-                    if ($product_option_value_description === null) {
-                        $product_option_value_description = $product_option_value->descriptions()->first();
-                    }
-                    $orderOption["option_name"] = $product_option_description->name;
-                    $orderOption["option_value_name"] = $product_option_value_description->name;
-                    $orderOption["price"] = number_format($product_option_value->price, 2);
-                }
-
-            }
-            $orderProduct['name'] = $product_description->name;
-
-            $orderProduct['options'] = $options;
-        }
-
-        return $orderProducts;
-    }
-    /**
-     * helper function to fetch order product options
-     * @param Integer OrderProductId
-     * @return Array(OrderOption)
-     */
-    public function fetchOrderPorductOption($order_product_id)
-    {
-        $options = OrderOption::where('order_product_id', $order_product_id)->get();
-
-        return $options;
-    }
     /**
      * create new order in DB
      *
@@ -239,21 +120,28 @@ class OrderController extends Controller
     {
         //1. validation
         //2. create
-        $today = new DateTime("now", new DateTimeZone('Australia/Sydney'));
-        $date_today = $today->format('y-m-d');
+        $dt = new DateTime("now", new DateTimeZone('Australia/Sydney'));
+        $today = $dt->format('y-m-d');
 
         $user = $request->user();
 
         $input = [
-            'invoice_no' => $request->invoice_no, 'store_id' => $request->store_id, 'customer_id' => $user->user_id, 'fax' => $request->fax, 'payment_method' => $request->payment_method, 'total' => $request->total, 'date_added' => $date_today, 'date_modified' => $date_today, 'order_status_id' => $request->order_status_id,
+            'invoice_no' => $request->invoice_no,
+            'store_id' => isset($request->store_id) ? $request->store_id : "",
+            'customer_id' => $user->user_id,
+            'fax' => isset($request->fax) ? $request->fax : "",
+            'payment_method' => isset($request->payment_method) ? $request->payment_method : "",
+            'total' => isset($request->total) ? $request->total : "",
+            'date_added' => $today,
+            'date_modified' => $today,
+            'order_status_id' => $request->order_status_id,
         ];
         $order = Order::create($input);
         if (isset($request->customerComments)) {
             $order->comment = $request->customerComments;
             $order->save();
-
         }
-        $order_products = $this->createOrderProducts($request, $order->order_id);
+        $order_products = $this->helper->createOrderProducts($request, $order->order_id);
 
         // make reponse body
 
@@ -263,74 +151,12 @@ class OrderController extends Controller
         $orders = Order::where('customer_id', $user->user_id)->get();
         // add details to each order
         foreach ($orders as $order) {
-            $detailedOrder = self::makeOrder($order);
+            $detailedOrder = $this->helper->makeOrder($order);
             array_push($responseOrders, $detailedOrder);
         }
 
         //3. return response
         return response()->json($responseOrders, 201);
-    }
-
-    /**
-     * @param Request $request
-     * @param Integer $order_id
-     * @return Array array of oc_order_product
-     */
-    public function createOrderProducts($request, $order_id)
-    {
-        $order_products = array();
-        foreach ($request->order_items as $orderItem) {
-            $orderItem = json_decode(json_encode($orderItem));
-            $order_product = OrderProduct::create([
-                'order_id' => $order_id,
-                'product_id' => $orderItem->product_id,
-                'quantity' => $orderItem->quantity,
-                'price' => $orderItem->price,
-                'total' => $orderItem->total,
-            ]);
-
-            // decrease product quantity
-            $product = Product::find($orderItem->product_id);
-            $product->decrement("quantity", $orderItem->quantity);
-            if (!isset($product) || $product->quantity < 0) {
-                return response()->json(["errors" => ["code" => 1, "message" => "quantity is over stock"]], 400);
-            }
-
-            if (isset($orderItem->options)) {
-                $orderOptions = $this->createOrderOptions($orderItem->options, $order_id, $order_product->order_product_id);
-                $order_product['options'] = $orderOptions;
-            }
-
-            array_push($order_products, $order_product);
-
-        }
-
-        return $order_products;
-    }
-
-    /**
-     * @param Array $options
-     * @param Integer $order_id
-     * @param Integer $order_product_id
-     * @return Array array of new oc_order_option
-     */
-    public function createOrderOptions($options, $order_id, $order_product_id)
-    {
-        $orderOptions = array();
-        foreach ($options as $option) {
-            $option = json_decode(json_encode($option));
-
-            $orderOption = OrderOption::create([
-                'order_id' => $order_id,
-                'order_product_id' => $order_product_id,
-                'product_option_id' => $option->product_option_id,
-                'product_option_value_id' => $option->product_option_value_id,
-            ]);
-
-            array_push($orderOptions, $orderOption);
-        }
-
-        return $orderOptions;
     }
 
     /**
@@ -514,12 +340,12 @@ class OrderController extends Controller
         $newOrder->save();
 
         $search_string = isset($request->search_string) ? $request->search_string : "";
-        $orders = self::makeOrders($search_string);
+        $orders = $this->helper->makeOrders($search_string);
         $dbOrder = Order::find($order_id);
         if ($dbOrder === null) {
             return response()->json(['errors' => "can not found order"], 400);
         }
-        $order = self::makeOrder($dbOrder);
+        $order = $this->helper->makeOrder($dbOrder);
 
         return response()->json(compact("order", "orders"), 200);
     }
