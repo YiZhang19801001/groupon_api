@@ -85,5 +85,9 @@ class Product extends Model
     {
         return $this->hasMany('App\ProductOptionValue', 'product_id', 'product_id');
     }
+    public function discounts()
+    {
+        return $this->hasMany('App\ProductDiscount', 'product_id', 'product_id');
+    }
 
 }

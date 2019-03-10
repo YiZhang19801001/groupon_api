@@ -19,11 +19,11 @@ use Illuminate\Http\Request;
 
 Route::get("initial", "InitController@index");
 
-Route::get('products/{product_id}', 'ProductController@show');
 Route::get('products', 'ProductController@index');
+Route::get('products/{product_id}', 'ProductController@show');
 Route::post('products', 'ProductController@create');
 Route::put('products/{product_id}', 'ProductController@update');
-Route::patch('products/{product_id}', 'ProductController@switchProductStatus');
+Route::patch('products/{product_id}', 'ProductController@patch');
 
 Route::get('categories', 'CategoryController@index');
 Route::get('categories/{category_id}', 'CategoryController@show');
