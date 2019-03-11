@@ -28,6 +28,28 @@ class UserController extends Controller
         }
         return $token;
     }
+    /**
+     * function - return all users information with permission object, URL: "users"
+     *
+     * @param Request $request
+     * @return Response {users}
+     */
+    public function index(Request $request)
+    {
+        $user_group = isset($request->user_group) ? $request->user_group : "customer";
+        $user_group_ids = $user_group === "customer" ? [1, 2] : [3];
+        // ::Review::
+        $users = User::with("permissions")->whereIn("user_group_id", $user_group_ids)->get();
+
+        return response()->json(compact("users"), 200);
+    }
+    /**
+     * function - user login with password and email addresss
+     * Todo:: user can login with username not only email
+     *
+     * @param Request $request
+     * @return Response
+     */
     public function login(Request $request)
     {
         $user = \App\User::where('email', $request->email)->get()->first();

@@ -46,6 +46,7 @@ Route::get('report', 'ReportsController@show');
 // Therefore the jwtMiddleware will be exclusive of them
 Route::post('user/login', 'UserController@login');
 Route::post('user/register', 'UserController@register');
+Route::get('users', 'UserController@index');
 
 Route::group(['middleware' => ['jwt.auth']], function () {
 // all routes to protected resources are registered here
