@@ -68,7 +68,12 @@ class ProductController extends Controller
         $category = json_decode(json_encode($request->category));
         $category_id = $category->category_id;
         //2. create oc_product
-        $newProduct = Product::create(['price' => $product->price, 'quantity' => $product->quantity, "sort_order" => $product->sort_order, "stock_status_id" => $product->stock_status_id]);
+        $newProduct = Product::create([
+            'price' => $product->price,
+            'quantity' => $product->quantity,
+            "sort_order" => $product->sort_order,
+            "stock_status_id" => $product->stock_status_id,
+        ]);
 
         $product_id = $newProduct->product_id;
 
@@ -93,18 +98,40 @@ class ProductController extends Controller
                 $option = json_decode(json_encode($option));
 
                 //4.1 create oc_product_option
-                $productOption = ProductOption::create(['product_id' => $product_id, 'option_id' => $option->option_id, 'value' => isset($option->value) ? $option->value : '', 'required' => isset($option->required) ? $option->required : 1]);
+                $productOption = ProductOption::create([
+                    'product_id' => $product_id,
+                    'option_id' => $option->option_id,
+                    'value' => isset($option->value) ? $option->value : '', 'required' => isset($option->required) ? $option->required : 1,
+                ]);
                 // create option_values
                 foreach ($option->values as $value) {
                     $value = json_decode(json_encode($value));
                     //4.6 create oc_product_option_value
-                    $productOptionValue = ProductOptionValue::create(['product_option_id' => $productOption->product_option_id, 'product_id' => $product_id, 'option_id' => $option->option_id, 'option_value_id' => $value->option_value_id, 'quantity' => isset($value->quantity) ? $value->quantity : 999, 'price' => isset($value->price) ? $value->price : 0]);
+                    $productOptionValue = ProductOptionValue::create([
+                        'product_option_id' => $productOption->product_option_id,
+                        'product_id' => $product_id, 'option_id' => $option->option_id,
+                        'option_value_id' => $value->option_value_id, 'quantity' => isset($value->quantity) ? $value->quantity : 999, 'price' => isset($value->price) ? $value->price : 0,
+                    ]);
                 }
             }
 
         }
 
         ProductToCategory::create(['product_id' => $product_id, "category_id" => $category_id]);
+
+        # groupon product add discounts
+        if ($request->isGroupon) {
+            $product = json_decode(json_encode($request->product));
+            ProductDiscount::create([
+                'product_id' => $product->product_id,
+                'quantity' => $product->discountQuantity,
+                'price' => $product->discountPrice,
+                'date_start' => $product->date_start,
+                'date_end' => $product->date_end,
+            ]);
+        }
+
+        # prepare response object
         $search_string = isset($request->search_string) ? $request->search_string : "";
         $status = isset($request->status) ? $request->status : 0;
         $language_id = isset($request->language_id) ? $request->language_id : 2;

@@ -1,6 +1,8 @@
 <?php
 
 return [
+    # custom setting
+    'baseurl' => env('BASEURL', '/roben_api/groupon/public'),
 
     /*
     |--------------------------------------------------------------------------

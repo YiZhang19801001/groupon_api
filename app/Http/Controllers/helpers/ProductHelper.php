@@ -3,6 +3,7 @@ namespace App\Http\Controllers\helpers;
 
 use App\Category;
 use App\Product;
+use App\ProductToCategory;
 
 class ProductHelper
 {
@@ -30,11 +31,12 @@ class ProductHelper
             }
             $dto['name'] = $categoryDescription->name;
 
-            $products = $category->products()->where("status", $status)->where("quantity", ">", 0)->get();
+            $products = $category->products()->where("status", $status)->where("quantity", ">", 0)->orderBy("sort_order", "desc")->get();
 
             foreach ($products as $product) {
-
                 # deal with discount
+                // Todo:: read $user_group_id from $reqeust;
+                $user_group_id = 2;
                 $discountInfo = self::makeDiscountInfo($product, $user_group_id);
                 $product["price"] = $discountInfo["price"];
                 $product["isDiscount"] = $discountInfo["status"];
@@ -45,6 +47,14 @@ class ProductHelper
                     $productDescription = $product->descriptions()->first();
                 }
                 $product['name'] = $productDescription->name;
+
+                # make product image
+                $image_path = config("app.baseurl") . $product["image"];
+
+                if ($product["image"] === null || !file_exists($_SERVER['DOCUMENT_ROOT'] . $image_path)) {
+                    $product["image"] = '/images/products/default_product.jpg';
+
+                }
 
                 if ($search_string !== "" && !(strpos($product['name'], $search_string) !== false)) {
                     $products = $products->filter(function ($item) use ($product) {
